@@ -3,379 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AURUM LABEL | PREMIUM INTERFACE</title>
+    <title>AURUM | ELITE MUSIC LABEL</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;600;800;900&display=swap');
 
         :root {
-            /* Глубокий фон с небольшим шумом для объема */
-            --bg: #020204;
-            /* LIQUID GLASS VARS - Настройки дорогого стекла */
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            --glass-highlight: inset 0 1px 1px rgba(255,255,255,0.2);
-            --blur-strength: 60px;
-            --accent: #ffffff;
-            --transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            --bg: #030303;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --blur: 50px;
+            --accent: #fff;
+            --transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { 
-            background: radial-gradient(circle at top left, #1a1a20 0%, var(--bg) 60%);
-            color: #fff; 
-            overflow-x: hidden; 
-            -webkit-font-smoothing: antialiased;
+        body { background: var(--bg); color: #fff; overflow-x: hidden; }
+
+        /* КРУТОЙ КАНВАС НА ФОНЕ */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.6;
         }
 
-        /* УТИЛИТА: КЛАСС ДЛЯ ЖИДКОГО СТЕКЛА */
-        .liquid-glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur-strength)) saturate(120%);
-            -webkit-backdrop-filter: blur(var(--blur-strength)) saturate(120%);
+        /* КНОПКА В УГЛУ */
+        .header-action {
+            position: fixed;
+            top: 30px; right: 30px;
+            z-index: 1000;
+        }
+        .btn-contact {
+            padding: 12px 24px;
+            background: var(--glass);
             border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow), var(--glass-highlight);
-        }
-
-        /* ПЛАВНОЕ ПОЯВЛЕНИЕ */
-        .reveal { opacity: 0; transform: translateY(40px); transition: var(--transition); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        /* 1. HERO СЕКЦИЯ */
-        .hero {
-            min-height: 90vh; /* Чуть меньше 100, чтобы видеть начало контента */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            padding-top: 60px;
-        }
-        /* Кастомный SVG Логотип */
-        .hero-logo-svg {
-            width: 140px;
-            height: 140px;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 0 30px rgba(255,255,255,0.15));
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .hero-title {
-            font-size: clamp(28px, 6vw, 52px);
-            font-weight: 900;
-            letter-spacing: 18px;
-            text-transform: uppercase;
-            text-indent: 18px;
-            background: linear-gradient(to bottom, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* ОБЩИЕ СЕКЦИИ */
-        .section {
-            padding: 120px 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        .section-title {
-            text-align: center;
-            font-size: 12px;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            opacity: 0.4;
-            margin-bottom: 50px;
-            font-weight: 400;
-        }
-
-        /* 2. БЛОК "О НАС" */
-        .about-card {
-            border-radius: 50px;
-            padding: 70px 40px;
-            text-align: center;
-            max-width: 850px;
-            margin: 0 auto;
-        }
-        .about-card p {
-            font-size: clamp(18px, 2.5vw, 26px);
-            line-height: 1.5;
-            font-weight: 200;
-            color: rgba(255,255,255,0.85);
-        }
-        .about-card b { font-weight: 700; color: #fff; }
-
-        /* 3. СЛАЙДЕР АРТИСТОВ */
-        .swiper { width: 100%; padding: 30px 0 80px; }
-        .swiper-slide { width: auto; /* Важно для auto slidesPerView */ }
-        
-        .artist-card {
-            width: 310px; /* Фиксированный размер карточки */
-            height: 460px;
-            border-radius: 35px;
-            overflow: hidden;
-            position: relative;
-            transition: var(--transition);
-            /* Стеклянная подложка */
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-        }
-        .artist-photo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Фотки заполняют карточку без искажений */
-            object-position: center top;
-            filter: grayscale(1) brightness(0.7) contrast(1.1);
-            transition: 0.8s ease;
-        }
-        .artist-info {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%;
-            padding: 35px 25px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent);
-            transform: translateY(10px);
-            transition: var(--transition);
-        }
-        .artist-name {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* Активный слайд по центру */
-        .swiper-slide-active .artist-card { 
-            border-color: rgba(255,255,255,0.4); 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.3);
-            transform: scale(1.08); 
-        }
-        .swiper-slide-active .artist-photo { filter: grayscale(0) brightness(1); }
-        .swiper-slide-active .artist-info { transform: translateY(0); }
-
-        /* 4. ПАРТНЕРЫ (ГРИД) */
-        .partners-wrapper {
-            border-radius: 40px;
-            padding: 30px;
-        }
-        .partners-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 30px;
-            align-items: center;
-            justify-items: center;
-        }
-        .partner-item {
-            height: 80px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            padding: 15px;
-            border-radius: 20px;
-        }
-        .partner-item img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            filter: grayscale(1) opacity(0.4);
-            transition: 0.4s;
-        }
-        .partner-item:hover { background: rgba(255,255,255,0.05); }
-        .partner-item:hover img { filter: grayscale(0) opacity(1); }
-
-        /* 5. DEMO DROP SECTION (СВЯЗЬ) */
-        .demo-section { text-align: center; padding-bottom: 60px;}
-        .demo-card {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 50px 30px;
-            border-radius: 40px;
-        }
-        .demo-title { font-size: 24px; font-weight: 800; margin-bottom: 15px; letter-spacing: 2px; }
-        .demo-text { font-weight: 200; opacity: 0.7; margin-bottom: 30px; }
-        
-        .glass-btn {
-            display: inline-block;
-            text-decoration: none;
-            padding: 20px 50px;
-            border-radius: 30px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            backdrop-filter: blur(20px);
+            border-radius: 100px;
             color: #fff;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            cursor: pointer;
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
         }
-        .glass-btn:hover {
-            background: rgba(255,255,255,0.1);
-            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
-            transform: translateY(-3px);
+        .btn-contact:hover { background: #fff; color: #000; transform: scale(1.05); }
+
+        /* МОДАЛЬНОЕ ОКНО */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        .modal-content {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 50px;
+            border-radius: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        .modal-content h2 { margin-bottom: 20px; font-weight: 800; letter-spacing: 2px; }
+        .modal-content p { font-weight: 200; opacity: 0.7; margin-bottom: 30px; line-height: 1.6; }
+        .close-modal { 
+            margin-top: 20px; cursor: pointer; opacity: 0.5; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
         }
 
-        /* 6. ФУТЕР */
-        .footer {
-            padding: 80px 20px 40px;
-            text-align: center;
-            border-top: 1px solid var(--glass-border);
-            background: linear-gradient(to bottom, var(--bg), #000);
+        /* HERO */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .hero-title { 
+            font-size: clamp(40px, 8vw, 80px); 
+            font-weight: 900; letter-spacing: 25px; 
+            text-transform: uppercase; text-indent: 25px;
+            opacity: 0; transform: translateY(20px); animation: fadeInUp 1.5s forwards 0.5s;
         }
-        .social-links { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
-        .social-links a { 
-            color: #fff; font-size: 22px; opacity: 0.3; 
-            transition: 0.3s; text-decoration: none;
-            display: flex; align-items: center; justify-content: center;
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 1px solid transparent;
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* SECTION REVEAL */
+        .section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; opacity: 0; transform: translateY(30px); transition: 1s ease-out; }
+        .section.active { opacity: 1; transform: translateY(0); }
+
+        /* ARTISTS SLIDER */
+        .swiper { width: 100%; padding: 50px 0 100px; }
+        .swiper-slide { width: auto; }
+        .artist-card {
+            width: 320px; height: 480px;
+            border-radius: 40px; overflow: hidden; position: relative;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(var(--blur));
+            transition: var(--transition);
         }
-        .social-links a:hover { 
-            opacity: 1; 
-            background: rgba(255,255,255,0.05);
-            border-color: var(--glass-border);
+        .artist-photo { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.5); transition: 0.8s ease; }
+        .artist-info {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 30px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            z-index: 2;
         }
-        .copyright { font-size: 10px; letter-spacing: 4px; opacity: 0.2; text-transform: uppercase; }
+        .artist-name { font-size: 20px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .swiper-slide-active .artist-card { transform: scale(1.05); border-color: rgba(255,255,255,0.3); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .swiper-slide-active .artist-photo { filter: grayscale(0) brightness(1); }
+
+        /* СТРЕЛКИ НАВИГАЦИИ */
+        .nav-container { display: flex; justify-content: center; gap: 20px; margin-top: -30px; }
+        .nav-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; transition: 0.3s;
+        }
+        .nav-btn:hover { background: #fff; color: #000; }
+
+        /* PARTNERS MARQUEE (БЕГУЩАЯ СТРОКА) */
+        .partners-marquee {
+            overflow: hidden; display: flex; gap: 80px; padding: 40px 0;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+        .marquee-track { display: flex; gap: 80px; animation: scroll 20s linear infinite; }
+        .marquee-track img { height: 40px; filter: grayscale(1) invert(1) opacity(0.5); }
+        @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     </style>
 </head>
 <body>
 
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="header-action">
+        <button class="btn-contact" onclick="toggleModal(true)">Contact Label</button>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content">
+            <h2>DEMO DROP</h2>
+            <p>Мы ищем таланты. Присылай ссылку на Soundcloud или облако. Если это жир — мы перезвоним.</p>
+            <a href="mailto:demo@aurum.label" class="btn-contact" style="display: block; text-decoration: none;">Send Track</a>
+            <div class="close-modal" onclick="toggleModal(false)">[ close ]</div>
+        </div>
+    </div>
+
     <section class="hero">
-        <svg class="hero-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 10L10 90H90L50 10Z" fill="url(#paint0_linear)" fill-opacity="0.2" stroke="white" stroke-width="1.5"/>
-            <path d="M50 25L25 85H75L50 25Z" fill="url(#paint1_linear)" fill-opacity="0.3" stroke="white" stroke-width="0.5" style="backdrop-filter: blur(10px);"/>
-            <defs>
-                <linearGradient id="paint0_linear" x1="50" y1="10" x2="50" y2="90" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="white" stop-opacity="0.8"/>
-                    <stop offset="1" stop-color="white" stop-opacity="0"/>
-                </linearGradient>
-                <linearGradient id="paint1_linear" x1="50" y1="25" x2="50" y2="85" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="white"/>
-                    <stop offset="1" stop-color="white" stop-opacity="0"/>
-                </linearGradient>
-            </defs>
-        </svg>
         <h1 class="hero-title">AURUM</h1>
     </section>
 
-    <section class="section reveal">
-        <div class="about-card liquid-glass">
-            <p><b>AURUM</b> — это не просто лейбл. Это закрытый клуб, где визионерский звук встречается с премиальной эстетикой. Мы создаем наследие.</p>
+    <section class="section">
+        <div style="text-align: center; max-width: 800px; margin: 0 auto; font-size: 24px; font-weight: 200; line-height: 1.6;">
+            <span style="font-weight: 800;">AURUM</span> — это концентрация звука и визуальной культуры. Мы не штампуем контент, мы создаем иконы.
         </div>
     </section>
 
-    <section class="section reveal">
-        <h2 class="section-title">Резиденты</h2>
+    <section class="section">
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
                 <div class="swiper-slide">
                     <div class="artist-card">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/T-Fest_%E2%80%94_official_press_photo_%E2%80%94_2025_%E2%80%94_by_manager.jpg" class="artist-photo">
-                        <div class="artist-info">
-                            <div class="artist-name">T-FEST</div>
-                        </div>
+                        <div class="artist-info"><div class="artist-name">T-FEST</div></div>
                     </div>
                 </div>
                 <div class="swiper-slide">
                     <div class="artist-card">
                         <img src="https://designer.kz/wp-content/uploads/2024/06/Skryptonite.webp" class="artist-photo">
-                        <div class="artist-info">
-                            <div class="artist-name">СКРИПТОНИТ</div>
-                        </div>
+                        <div class="artist-info"><div class="artist-name">СКРИПТОНИТ</div></div>
                     </div>
                 </div>
                 <div class="swiper-slide">
                     <div class="artist-card">
                         <img src="https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000" class="artist-photo">
-                        <div class="artist-info">
-                            <div class="artist-name">BULAVIN</div>
-                        </div>
+                        <div class="artist-info"><div class="artist-name">FRIENDLY THUG 52</div></div>
                     </div>
                 </div>
-                 <div class="swiper-slide">
+                <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600" class="artist-photo">
-                        <div class="artist-info">
-                            <div class="artist-name">GHOSTWRITER</div>
-                        </div>
+                        <img src="https://obs-image-service-mz.obs.ru-moscow-1.hc.sbercloud.ru/44f207c7-2160-40ca-b127-c7180d010354" class="artist-photo">
+                        <div class="artist-info"><div class="artist-name">MACAN</div></div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="nav-container">
+            <div class="nav-btn swiper-prev"><i class="fa-solid fa-chevron-left"></i></div>
+            <div class="nav-btn swiper-next"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
     </section>
 
-    <section class="section reveal">
-        <h2 class="section-title">Ключевые партнеры</h2>
-        <div class="partners-wrapper liquid-glass">
-            <div class="partners-grid">
-                <div class="partner-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png" alt="Zvonko">
-                </div>
-                <div class="partner-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/VK_Music_Full_Logo.svg/1280px-VK_Music_Full_Logo.svg.png" alt="VK Music">
-                </div>
-                <div class="partner-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Yandex_Music_icon.svg/2048px-Yandex_Music_icon.svg.png" alt="Yandex Music">
-                </div>
+    <section class="section">
+        <div class="partners-marquee">
+            <div class="marquee-track">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/VK_Music_Full_Logo.svg/1280px-VK_Music_Full_Logo.svg.png">
+                <img src="https://img.ixbt.site/live/topics/preview/00/07/95/94/a6ff0bfe41.png">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/VK_Music_Full_Logo.svg/1280px-VK_Music_Full_Logo.svg.png">
+                <img src="https://img.ixbt.site/live/topics/preview/00/07/95/94/a6ff0bfe41.png">
             </div>
         </div>
     </section>
 
-    <section class="section demo-section reveal">
-        <div class="demo-card liquid-glass">
-            <h3 class="demo-title">WE ARE SCOUTING</h3>
-            <p class="demo-text">Твой звук готов к большой сцене? Отправь нам демо. Только лучшие треки, только приватные ссылки.</p>
-            <a href="mailto:demo@aurum.label" class="glass-btn liquid-glass">ОТПРАВИТЬ DEMO</a>
-        </div>
-    </section>
-
-    <footer class="footer reveal">
-        <div class="social-links">
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-telegram"></i></a>
-            <a href="#"><i class="fa-brands fa-soundcloud"></i></a>
-        </div>
-        <div class="copyright">© 2026 AURUM LABEL • EST. MOSCOW</div>
+    <footer style="padding: 100px 20px; text-align: center; border-top: 1px solid var(--glass-border);">
+        <p style="font-size: 10px; letter-spacing: 5px; opacity: 0.3;">© 2026 AURUM WORLDWIDE</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
+        /* CANVAS BACKGROUND ANIMATION */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        for(let i = 0; i < 5; i++) {
+            points.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                size: Math.random() * 300 + 200,
+                color: i % 2 === 0 ? '#ffffff' : '#444444'
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            points.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        /* SWIPER CONFIG */
         const swiper = new Swiper(".mySwiper", {
             effect: "coverflow",
-            grabCursor: true, // Курсор-рука
+            grabCursor: true,
             centeredSlides: true,
             slidesPerView: "auto",
-            speed: 800, // Плавная скорость перелистывания
-            mousewheel: { // ВКЛЮЧАЕМ ПРОКРУТКУ КОЛЕСИКОМ
-                enabled: true,
-                sensitivity: 1.5,
-            },
-            coverflowEffect: {
-                rotate: 15,
-                stretch: 0,
-                depth: 250, // Глубина 3D эффекта
-                modifier: 1,
-                slideShadows: false, // Тени отключил, они дешевят стекло
-            },
+            speed: 1000,
+            mousewheel: { sensitivity: 1 },
+            navigation: { nextEl: ".swiper-next", prevEl: ".swiper-prev" },
+            coverflowEffect: { rotate: 5, stretch: 0, depth: 150, modifier: 2, slideShadows: false },
             loop: true,
         });
 
-        /* Скрипт появления блоков при скролле */
-        const observerOptions = { threshold: 0.15 };
+        /* MODAL LOGIC */
+        function toggleModal(show) {
+            document.getElementById('contactModal').style.display = show ? 'flex' : 'none';
+        }
+
+        /* REVEAL ON SCROLL */
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, observerOptions);
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.section').forEach(s => observer.observe(s));
     </script>
 </body>
 </html>
