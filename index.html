@@ -2,333 +2,371 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AURUM MUSIC | OFFICIAL</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Raleway:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Raleway:wght@700;900&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* CSS VARIABLES */
         :root {
-            --aurum: #D4AF37;
-            --aurum-dark: #b5952f;
-            --bg: #000000;
-            --bg-light: #0a0a0a;
-            --glass: rgba(20, 20, 20, 0.6);
-            --border: rgba(255, 255, 255, 0.08);
+            --aurum: #D4AF37; /* Фирменное золото AURUM */
+            --bg-dark: #050505;
+            --bg-card: #111111;
+            --glass-bg: rgba(10, 10, 10, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-main: #ffffff;
-            --text-muted: rgba(255, 255, 255, 0.5);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --transition-smooth: 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* HARD RESET & VIEWPORT FIX */
+        /* RESET & CORE STYLES */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html, body {
             width: 100%;
-            max-width: 100vw;
-            overflow-x: hidden; /* Жестко режем горизонтальный вылет */
-            background-color: var(--bg);
+            background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
-            overscroll-behavior-y: none;
+            overflow-x: hidden;
         }
 
-        /* ГЛАВНЫЙ КОНТЕЙНЕР ДЛЯ ЗАЩИТЫ ОТ ЗУМА */
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--aurum); }
+
+        /* MAIN WRAPPER (Fixes mobile zoom/overflow bugs) */
         .page-wrapper {
+            position: relative;
             width: 100%;
             overflow: hidden;
-            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ШАПКА */
+        /* --- HEADER (GLASSMORPHISM) --- */
         .header {
             position: fixed;
             top: 0; left: 0; width: 100%;
-            height: 70px;
+            height: 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 4%;
-            z-index: 1000;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            z-index: 9999;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.4s ease;
         }
 
         .header-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
             color: var(--text-main);
         }
 
-        .header-logo svg {
-            width: 32px; height: 32px; fill: var(--aurum);
-        }
+        /* Кастомный векторный логотип AURUM */
+        .logo-mark { width: 36px; height: 36px; fill: var(--aurum); }
+        .logo-text { font-family: 'Raleway', sans-serif; font-weight: 900; font-size: 24px; letter-spacing: 4px; }
 
-        .header-logo span {
-            font-family: 'Raleway', sans-serif;
-            font-weight: 900;
-            font-size: 20px;
-            letter-spacing: 4px;
-        }
-
-        .header-nav { display: flex; gap: 30px; }
+        .header-nav { display: flex; gap: 40px; }
         .header-nav a {
             color: var(--text-muted);
             text-decoration: none;
             font-size: 13px;
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
+            letter-spacing: 2px;
+            transition: 0.3s ease;
         }
-        .header-nav a:hover { color: var(--aurum); }
+        .header-nav a:hover, .header-nav a.active {
+            color: var(--aurum);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
 
-        /* HERO */
+        .demo-btn {
+            background: transparent;
+            color: var(--aurum);
+            border: 1px solid var(--aurum);
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .demo-btn:hover { background: var(--aurum); color: #000; box-shadow: 0 0 20px rgba(212,175,55,0.4); }
+
+        /* --- HERO SECTION --- */
         .hero {
             position: relative;
-            width: 100%;
+            width: 100vw;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            overflow: hidden;
         }
 
-        .spline-bg {
+        /* Контейнер для кастомного 3D-фона на Canvas */
+        #interactive-canvas {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 1;
-            pointer-events: auto;
-        }
-        
-        .spline-bg iframe {
-            width: 100%; height: 100%; border: none;
         }
 
-        .hero-text {
+        .hero-content {
             position: relative;
-            z-index: 2;
-            pointer-events: none;
+            z-index: 10;
             text-align: center;
+            pointer-events: none; /* Чтобы мышка просвечивала до Canvas */
         }
 
-        .hero-text h1 {
+        .hero-content h1 {
             font-family: 'Raleway', sans-serif;
-            font-size: clamp(50px, 12vw, 150px);
+            font-size: clamp(60px, 12vw, 180px);
             font-weight: 900;
-            line-height: 0.9;
-            letter-spacing: -2px;
-            color: transparent;
-            -webkit-text-stroke: 1px var(--text-main);
-            text-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
-            position: relative;
-        }
-
-        .hero-text h1::before {
-            content: "AURUM\A MUSIC";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, #fff 0%, var(--aurum) 100%);
+            line-height: 0.85;
+            letter-spacing: -3px;
+            margin-bottom: 20px;
+            /* Эффект металлического/золотого градиента на тексте */
+            background: linear-gradient(180deg, #ffffff 0%, #a88a2a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 0;
-            opacity: 0.8;
+            text-shadow: 0 20px 40px rgba(0,0,0,0.8);
         }
 
-        /* ОБЩИЕ СТИЛИ СЕКЦИЙ */
+        .hero-content p {
+            font-size: clamp(14px, 2vw, 20px);
+            color: var(--text-muted);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* --- SECTIONS CORE --- */
         .section {
-            padding: 100px 0 60px;
-            border-top: 1px solid var(--border);
             position: relative;
+            width: 100%;
+            padding: 120px 0;
+            z-index: 10;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
         }
 
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding: 0 4% 40px;
+            padding: 0 5% 50px;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
         .section-title {
             font-family: 'Raleway', sans-serif;
-            font-size: clamp(32px, 5vw, 64px);
+            font-size: clamp(32px, 6vw, 70px);
             font-weight: 900;
             text-transform: uppercase;
             line-height: 1;
+            color: #fff;
         }
 
-        /* УПРАВЛЕНИЕ КАРУСЕЛЬЮ */
-        .slider-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .slider-btn {
-            width: 48px; height: 48px;
+        /* НАВИГАЦИЯ СЛАЙДЕРА */
+        .slider-nav { display: flex; gap: 15px; }
+        .nav-arrow {
+            width: 50px; height: 50px;
             border-radius: 50%;
-            border: 1px solid var(--border);
-            background: var(--bg-light);
-            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: #fff;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
         }
+        .nav-arrow:hover { background: var(--aurum); border-color: var(--aurum); color: #000; }
+        .nav-arrow.swiper-button-disabled { opacity: 0.2; pointer-events: none; }
 
-        .slider-btn:hover {
-            background: var(--aurum);
-            border-color: var(--aurum);
-            color: #000;
-        }
-        
-        .slider-btn.swiper-button-disabled {
-            opacity: 0.3; cursor: not-allowed;
-            background: transparent; color: var(--text-muted);
-        }
-
-        /* КАРТОЧКИ АРТИСТОВ */
+        /* --- SWIPER ARTISTS TWEAKS --- */
+        /* Разрешаем карточкам выходить за пределы, чтобы по бокам было видно соседей */
         .swiper {
             width: 100%;
-            padding: 0 4% 40px !important;
-            overflow: visible !important; /* Разрешаем карточкам вылезать за пределы свайпера, но они скрыты в page-wrapper */
+            padding: 40px 0 80px !important;
+        }
+
+        .swiper-wrapper {
+            align-items: center; /* Важно для центрирования разных размеров */
         }
 
         .swiper-slide {
-            width: 320px;
-            height: 480px;
+            width: 340px; /* Размер карточки на ПК */
+            height: 500px;
+            /* СТИЛЬ НЕАКТИВНОЙ КАРТОЧКИ (Стекло, Ч/Б, Меньше размер) */
+            transition: var(--transition-smooth);
+            transform: scale(0.85);
+            filter: grayscale(100%) brightness(0.4);
+            opacity: 0.6;
+        }
+
+        /* СТИЛЬ АКТИВНОЙ КАРТОЧКИ (ЦЕНТР, ЦВЕТНАЯ, БОЛЬШАЯ) */
+        .swiper-slide-active {
+            transform: scale(1.05);
+            filter: grayscale(0%) brightness(1);
+            opacity: 1;
+            z-index: 10;
         }
 
         .artist-card {
             width: 100%; height: 100%;
-            border-radius: 16px;
+            background: var(--bg-card);
+            border-radius: 24px;
             overflow: hidden;
             position: relative;
-            background: var(--bg-light);
-            border: 1px solid var(--border);
-            transform: translateZ(0); /* Аппаратное ускорение */
-            transition: transform 0.4s ease, border-color 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-smooth);
+        }
+
+        /* Золотое свечение только у активной карточки */
+        .swiper-slide-active .artist-card {
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.15);
         }
 
         .artist-card img {
             width: 100%; height: 100%;
             object-fit: cover;
-            filter: grayscale(100%);
-            transition: filter 0.5s ease, transform 0.8s ease;
-        }
-
-        .artist-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--aurum);
-        }
-
-        .artist-card:hover img {
-            filter: grayscale(0%);
-            transform: scale(1.05);
         }
 
         .artist-info {
             position: absolute;
             bottom: 0; left: 0; width: 100%;
-            padding: 40px 20px 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+            height: 60%;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 40%, transparent 100%);
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            pointer-events: none;
+            padding: 30px;
+            transition: var(--transition-smooth);
         }
 
         .artist-info h3 {
             font-family: 'Raleway', sans-serif;
-            font-weight: 800;
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: 900;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
         }
 
         .artist-info p {
-            font-size: 12px;
-            color: var(--aurum);
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-size: 11px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--aurum);
         }
 
-        /* ДЕТСКИЙ БЛОК (KIDS) */
-        .kids-section .artist-card {
-            border-radius: 30px; /* Более мягкие углы для детского блока */
+        /* Анимация текста только на активном слайде */
+        .swiper-slide .artist-info h3, 
+        .swiper-slide .artist-info p {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: var(--transition-smooth);
         }
-        .kids-section .artist-card:hover {
-            border-color: #fff; /* Белый акцент вместо золотого для детей */
-            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
-        }
-        .kids-section .artist-info p { color: #fff; }
 
-        /* БЕГУЩАЯ СТРОКА ПАРТНЕРОВ */
-        .marquee-section {
-            padding: 80px 0;
-            background: var(--bg-light);
-            border-top: 1px solid var(--border);
+        .swiper-slide-active .artist-info h3, 
+        .swiper-slide-active .artist-info p {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* --- MARQUEE (ПАРТНЕРЫ С ИНЛАЙН SVG) --- */
+        .partners-section {
+            padding: 60px 0;
+            background: #030303;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
             overflow: hidden;
             display: flex;
-            /* Градиентные края для плавного растворения логотипов */
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            /* Плавное растворение по краям */
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
 
         .marquee-track {
             display: flex;
             align-items: center;
+            gap: 100px; /* Отступы между лого */
             width: max-content;
-            animation: scroll 20s linear infinite;
+            animation: marqueeScroll 25s linear infinite;
         }
 
-        .marquee-track img {
-            height: 40px;
-            margin: 0 50px;
-            filter: brightness(0) invert(1);
-            opacity: 0.4;
-            transition: 0.3s ease;
+        .marquee-track:hover { animation-play-state: paused; } /* Остановка при наведении */
+
+        .partner-logo {
+            height: 35px;
+            fill: #ffffff; /* Белый цвет SVG */
+            opacity: 0.3;
+            transition: 0.3s;
+            cursor: pointer;
         }
+        
+        .partner-logo:hover { opacity: 1; fill: var(--aurum); transform: scale(1.1); }
 
-        .marquee-track img:hover { opacity: 1; }
-
-        @keyframes scroll {
+        @keyframes marqueeScroll {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
 
-        /* ПОДВАЛ */
-        footer {
-            padding: 40px 4%;
+        /* --- FOOTER --- */
+        .footer {
+            padding: 50px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid var(--border);
             font-size: 12px;
+            font-weight: 500;
             color: var(--text-muted);
             letter-spacing: 1px;
+            background: var(--bg-dark);
         }
 
-        /* АДАПТИВНОСТЬ МЕНЕЕ 768px */
+        /* --- АДАПТИВ ПОД ТЕЛЕФОНЫ --- */
         @media (max-width: 768px) {
-            .header { height: 60px; }
-            .header-nav { display: none; } /* Скрываем меню на мобилке (нужен бургер позже) */
+            .header { height: 70px; padding: 0 20px; }
+            .header-nav { display: none; } /* Скрываем меню на мобилке */
+            .logo-text { font-size: 18px; }
             
-            .section-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .slider-controls { align-self: flex-end; }
+            .section-header { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 20px; 
+                padding: 0 20px 30px;
+            }
+            .slider-nav { align-self: flex-end; }
             
-            .swiper-slide { width: 260px; height: 380px; } /* Карточки меньше на мобилке */
-            .artist-info h3 { font-size: 20px; }
+            .swiper-slide { 
+                width: 260px; /* На мобилке карточки меньше */
+                height: 380px; 
+            }
             
-            footer { flex-direction: column; gap: 10px; text-align: center; }
+            .footer { flex-direction: column; gap: 20px; text-align: center; }
         }
     </style>
 </head>
@@ -338,35 +376,34 @@
 
     <header class="header">
         <a href="#" class="header-logo">
-            <svg viewBox="0 0 100 100">
-                <path d="M50 5 L95 90 L80 90 L50 40 L20 90 L5 90 Z M40 75 L60 75 L63 83 L37 83 Z" />
+            <svg class="logo-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 5 L95 90 L75 90 L50 40 L25 90 L5 90 Z M38 72 L62 72 L65 80 L35 80 Z"/>
             </svg>
-            <span>AURUM</span>
+            <span class="logo-text">AURUM</span>
         </a>
         <nav class="header-nav">
-            <a href="#main-roster">Артисты</a>
+            <a href="#artists">Артисты</a>
             <a href="#freshmen">Freshmen</a>
-            <a href="#kids">Kids</a>
             <a href="#partners">Партнеры</a>
         </nav>
+        <button class="demo-btn">Send Demo</button>
     </header>
 
     <section class="hero">
-        <div class="spline-bg">
-            <iframe src="https://my.spline.design/untitled-aa4691f544b9c039811cdbcef2868378/" frameborder="0"></iframe>
-        </div>
-        <div class="hero-text">
-            <h1 style="white-space: pre-wrap;">AURUM
-MUSIC</h1>
+        <canvas id="interactive-canvas"></canvas>
+        
+        <div class="hero-content">
+            <h1>AURUM</h1>
+            <p>Music Label & Distribution</p>
         </div>
     </section>
 
-    <section class="section" id="main-roster">
+    <section class="section" id="artists">
         <div class="section-header">
-            <h2 class="section-title">Main Roster</h2>
-            <div class="slider-controls">
-                <div class="slider-btn main-prev"><i class="fa-solid fa-chevron-left"></i></div>
-                <div class="slider-btn main-next"><i class="fa-solid fa-chevron-right"></i></div>
+            <h2 class="section-title">Наши артисты</h2>
+            <div class="slider-nav">
+                <button class="nav-arrow main-prev"><i class="fa-solid fa-arrow-left"></i></button>
+                <button class="nav-arrow main-next"><i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </div>
         
@@ -377,7 +414,7 @@ MUSIC</h1>
                         <img src="https://designer.kz/wp-content/uploads/2024/06/Skryptonite.webp" alt="Скриптонит">
                         <div class="artist-info">
                             <h3>Скриптонит</h3>
-                            <p>Legend</p>
+                            <p>Headliner</p>
                         </div>
                     </div>
                 </div>
@@ -392,10 +429,10 @@ MUSIC</h1>
                 </div>
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000" alt="Bulavin">
+                        <img src="https://static.tildacdn.com/tild3339-3131-4534-b832-316431646437/_.JPG" alt="Лазарев">
                         <div class="artist-info">
-                            <h3>Bulavin</h3>
-                            <p>New Wave</p>
+                            <h3>Сергей Лазарев</h3>
+                            <p>Legend</p>
                         </div>
                     </div>
                 </div>
@@ -404,7 +441,16 @@ MUSIC</h1>
                         <img src="https://obs-image-service-mz.obs.ru-moscow-1.hc.sbercloud.ru/44f207c7-2160-40ca-b127-c7180d010354" alt="Pharaoh">
                         <div class="artist-info">
                             <h3>Pharaoh</h3>
-                            <p>Headliner</p>
+                            <p>Icon</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="artist-card">
+                        <img src="https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000" alt="Bulavin">
+                        <div class="artist-info">
+                            <h3>Bulavin</h3>
+                            <p>Main Roster</p>
                         </div>
                     </div>
                 </div>
@@ -415,9 +461,9 @@ MUSIC</h1>
     <section class="section" id="freshmen">
         <div class="section-header">
             <h2 class="section-title">Freshmen 2025</h2>
-            <div class="slider-controls">
-                <div class="slider-btn fresh-prev"><i class="fa-solid fa-chevron-left"></i></div>
-                <div class="slider-btn fresh-next"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="slider-nav">
+                <button class="nav-arrow fresh-prev"><i class="fa-solid fa-arrow-left"></i></button>
+                <button class="nav-arrow fresh-next"><i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </div>
         
@@ -428,7 +474,7 @@ MUSIC</h1>
                         <img src="https://static.tildacdn.com/tild6165-6431-4464-a462-336662313637/IMG_2242.JPG" alt="Lourenz">
                         <div class="artist-info">
                             <h3>Lourenz</h3>
-                            <p>Fresh</p>
+                            <p>New Wave</p>
                         </div>
                     </div>
                 </div>
@@ -437,6 +483,15 @@ MUSIC</h1>
                         <img src="https://static.tildacdn.com/tild3836-3237-4962-b736-633565333833/MELO_GANDZUBAS.jpg" alt="Babyface Melo">
                         <div class="artist-info">
                             <h3>Babyface Melo</h3>
+                            <p>Trend</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="artist-card">
+                        <img src="https://static.tildacdn.com/tild6662-3939-4162-a539-623931393433/IMG000_1.jpg" alt="Scally Milano">
+                        <div class="artist-info">
+                            <h3>Scally Milano</h3>
                             <p>Fresh</p>
                         </div>
                     </div>
@@ -446,49 +501,7 @@ MUSIC</h1>
                         <img src="https://static.tildacdn.com/tild6437-6166-4137-b239-636366393664/IMG_9299.JPG" alt="xe1to">
                         <div class="artist-info">
                             <h3>xe1to</h3>
-                            <p>Fresh</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section kids-section" id="kids">
-        <div class="section-header">
-            <h2 class="section-title" style="color: #fff;">Для Детей</h2>
-            <div class="slider-controls">
-                <div class="slider-btn kids-prev"><i class="fa-solid fa-chevron-left"></i></div>
-                <div class="slider-btn kids-next"><i class="fa-solid fa-chevron-right"></i></div>
-            </div>
-        </div>
-        
-        <div class="swiper kidsSwiper">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <div class="artist-card">
-                        <img src="https://static.tildacdn.com/tild3039-3435-4962-a631-363163386363/Cover-1_1000x1345_1.jpg" alt="Маша и Медведь">
-                        <div class="artist-info">
-                            <h3>Маша и Медведь</h3>
-                            <p>Family</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="artist-card">
-                        <img src="https://static.tildacdn.com/tild3262-3432-4334-b537-346635336334/MusicAvatar_Spotify_.png" alt="Цветняшки">
-                        <div class="artist-info">
-                            <h3>Цветняшки</h3>
-                            <p>Family</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="artist-card">
-                        <img src="https://static.tildacdn.com/tild6663-3531-4666-b938-313064666538/2026-01-09_142254.jpg" alt="Три Кота">
-                        <div class="artist-info">
-                            <h3>Три Кота</h3>
-                            <p>Family</p>
+                            <p>Upcoming</p>
                         </div>
                     </div>
                 </div>
@@ -498,64 +511,192 @@ MUSIC</h1>
 
     <section class="marquee-section" id="partners">
         <div class="marquee-track">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png" alt="Zvonko">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1024px-Amazon_logo.svg.png" alt="Amazon">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_logo.svg/1024px-Apple_Music_logo.svg.png" alt="Apple Music">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png" alt="Zvonko">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1024px-Amazon_logo.svg.png" alt="Amazon">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_logo.svg/1024px-Apple_Music_logo.svg.png" alt="Apple Music">
+            <svg class="partner-logo" viewBox="0 0 496 496" xmlns="http://www.w3.org/2000/svg">
+                <path d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm114.6 358.5c-4.5 7.4-14.1 9.7-21.5 5.2-58.8-35.9-132.8-44.1-220-24.1-8.5 1.9-17-3.4-18.9-11.9-1.9-8.5 3.4-17 11.9-18.9 95.8-21.9 177.3-12.7 243.3 28.2 7.4 4.5 9.7 14.1 5.2 21.5zm31.6-70.5c-5.7 9.2-18 12.1-27.2 6.4-67.9-41.6-172.5-54.3-255-29.6-10.4 3.1-21.4-2.8-24.5-13.2-3.1-10.4 2.8-21.4 13.2-24.5 94.6-28.3 210.7-14.1 287.1 33.7 9.2 5.7 12.1 18 6.4 27.2zm1.6-73.6c-81.5-48.4-215.9-52.9-293.7-29.2-12.6 3.8-26-3.3-29.8-15.9-3.8-12.6 3.3-26 15.9-29.8 91.5-27.9 240.8-22.6 335.7 34.1 11.4 6.8 15.1 21.5 8.3 32.9-6.8 11.5-21.5 15.2-32.9 8.4z"/>
+            </svg>
+            <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm110.1 161.4c1.2-15 11.3-28.8 25.4-36.2-7.1-10.4-18.2-17.6-30.8-19.5-13.3-2-26.6 2.6-35.3 10.4-8.8 7.8-19.1 11.5-29.8 10.6-13.8-1.1-26.6-7.8-36.7-18.6-22.3-24-58.8-26.5-84.4-6-19.5 15.7-32.5 39.4-36.5 66.5-7.7 52.3 18.2 103.5 62.5 123.6 12 5.5 24.8 8.1 37.8 7.8 13.9-.3 27.3-4.8 38.3-12.9 10.6-7.4 23.3-11.2 36.3-10.9 14.8.4 28.9 5.8 40.1 15.3 4.2 3.6 8.8 6.7 13.7 9.3-8.8-13.4-13.4-29.3-13.4-45.7 0-33.1 18.6-62.8 48.6-77.9-10.5-16.7-27.5-27.9-46.7-31-15.5-2.5-31.5 1.1-44 10-10.3 7.3-23 11-36 10.5-14.7-.4-28.5-6.5-38.9-17.1zm-85.3-26.8c12.2-15.1 19.3-34.5 18.9-54.4-19 1.7-36.8 10.3-49.3 23.9-11.2 12.2-17.9 28.5-18.5 45.4 19-1.3 36.8-9.4 48.9-22.3l.1-.2z" />
+            </svg>
+            <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm-53 362V150l146 106-146 106z"/>
+            </svg>
+            <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm-53 362V150l146 106-146 106z"/>
+            </svg>
+
+            <svg class="partner-logo" viewBox="0 0 496 496" xmlns="http://www.w3.org/2000/svg">
+                <path d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm114.6 358.5c-4.5 7.4-14.1 9.7-21.5 5.2-58.8-35.9-132.8-44.1-220-24.1-8.5 1.9-17-3.4-18.9-11.9-1.9-8.5 3.4-17 11.9-18.9 95.8-21.9 177.3-12.7 243.3 28.2 7.4 4.5 9.7 14.1 5.2 21.5zm31.6-70.5c-5.7 9.2-18 12.1-27.2 6.4-67.9-41.6-172.5-54.3-255-29.6-10.4 3.1-21.4-2.8-24.5-13.2-3.1-10.4 2.8-21.4 13.2-24.5 94.6-28.3 210.7-14.1 287.1 33.7 9.2 5.7 12.1 18 6.4 27.2zm1.6-73.6c-81.5-48.4-215.9-52.9-293.7-29.2-12.6 3.8-26-3.3-29.8-15.9-3.8-12.6 3.3-26 15.9-29.8 91.5-27.9 240.8-22.6 335.7 34.1 11.4 6.8 15.1 21.5 8.3 32.9-6.8 11.5-21.5 15.2-32.9 8.4z"/>
+            </svg>
+            <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm110.1 161.4c1.2-15 11.3-28.8 25.4-36.2-7.1-10.4-18.2-17.6-30.8-19.5-13.3-2-26.6 2.6-35.3 10.4-8.8 7.8-19.1 11.5-29.8 10.6-13.8-1.1-26.6-7.8-36.7-18.6-22.3-24-58.8-26.5-84.4-6-19.5 15.7-32.5 39.4-36.5 66.5-7.7 52.3 18.2 103.5 62.5 123.6 12 5.5 24.8 8.1 37.8 7.8 13.9-.3 27.3-4.8 38.3-12.9 10.6-7.4 23.3-11.2 36.3-10.9 14.8.4 28.9 5.8 40.1 15.3 4.2 3.6 8.8 6.7 13.7 9.3-8.8-13.4-13.4-29.3-13.4-45.7 0-33.1 18.6-62.8 48.6-77.9-10.5-16.7-27.5-27.9-46.7-31-15.5-2.5-31.5 1.1-44 10-10.3 7.3-23 11-36 10.5-14.7-.4-28.5-6.5-38.9-17.1zm-85.3-26.8c12.2-15.1 19.3-34.5 18.9-54.4-19 1.7-36.8 10.3-49.3 23.9-11.2 12.2-17.9 28.5-18.5 45.4 19-1.3 36.8-9.4 48.9-22.3l.1-.2z" />
+            </svg>
+            <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm-53 362V150l146 106-146 106z"/>
+            </svg>
+            <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm-53 362V150l146 106-146 106z"/>
+            </svg>
         </div>
     </section>
 
-    <footer>
-        <div>© 2026 AURUM MUSIC. ALL RIGHTS RESERVED.</div>
-        <div>DESIGNED FOR PERFORMANCE</div>
+    <footer class="footer">
+        <div>© 2026 AURUM MUSIC. MUSIC LABEL & DISTRIBUTION.</div>
+        <div>ST. PETERSBURG / MOSCOW</div>
     </footer>
 
 </div> <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 
 <script>
-    // 1. Инициализация плавного скролла (с защитой для мобилок)
+    /* =========================================
+       1. ПЛАВНЫЙ СКРОЛЛ (LENIS)
+       ========================================= */
     const lenis = new Lenis({
         duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
-        smoothTouch: false, // Отключаем плавный скролл на тачпадах, чтобы родной скролл iOS/Android не конфликтовал
+        touchMultiplier: 2, // Оставляем нативный скролл на тачпадах/мобилках
     });
+
     function raf(time) {
         lenis.raf(time);
         requestAnimationFrame(raf);
     }
     requestAnimationFrame(raf);
 
-    // Общие настройки для всех слайдеров
-    const swiperOptions = {
-        slidesPerView: "auto",
-        spaceBetween: 16,
-        freeMode: true,
+    /* =========================================
+       2. ИНИЦИАЛИЗАЦИЯ SWIPER (ЦЕНТРИРОВАНИЕ)
+       ========================================= */
+    const swiperConfig = {
+        centeredSlides: true, // Фокус всегда по центру
+        loop: true,           // Бесконечная прокрутка
         grabCursor: true,
+        speed: 800,           // Плавность перелистывания
+        effect: 'slide',
         breakpoints: {
-            768: {
-                spaceBetween: 30
+            // Мобилка: 1.5 карточки на экране
+            320: {
+                slidesPerView: 1.5,
+                spaceBetween: 20
+            },
+            // Десктоп: 3 карточки на экране
+            1024: {
+                slidesPerView: 3.5,
+                spaceBetween: 40
             }
         }
     };
 
-    // 2. Инициализация слайдеров (каждый привязан к своим стрелкам)
+    // Main Roster Swiper
     new Swiper(".mainSwiper", {
-        ...swiperOptions,
+        ...swiperConfig,
         navigation: { nextEl: ".main-next", prevEl: ".main-prev" }
     });
 
+    // Freshmen Swiper
     new Swiper(".freshSwiper", {
-        ...swiperOptions,
+        ...swiperConfig,
         navigation: { nextEl: ".fresh-next", prevEl: ".fresh-prev" }
     });
 
-    new Swiper(".kidsSwiper", {
-        ...swiperOptions,
-        navigation: { nextEl: ".kids-next", prevEl: ".kids-prev" }
+
+    /* =========================================
+       3. КАСТОМНЫЙ 3D АНИМИРОВАННЫЙ ФОН (Золотые частицы AURUM)
+       (Замена костыльному Spline, 100% независимый код)
+       ========================================= */
+    const canvas = document.getElementById('interactive-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    const mouse = { x: null, y: null, radius: 150 };
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Слушатели мыши
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.x;
+        mouse.y = e.y;
     });
+    window.addEventListener('mouseout', () => {
+        mouse.x = null;
+        mouse.y = null;
+    });
+
+    // Класс частицы (Золотая пыльца)
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.baseX = x;
+            this.baseY = y;
+            this.size = Math.random() * 2 + 1;
+            this.density = (Math.random() * 30) + 1;
+            this.color = `rgba(212, 175, 55, ${Math.random() * 0.8 + 0.2})`; // Aurum Color
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+        update() {
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            let forceDirectionX = dx / distance;
+            let forceDirectionY = dy / distance;
+            let maxDistance = mouse.radius;
+            let force = (maxDistance - distance) / maxDistance;
+            let directionX = forceDirectionX * force * this.density;
+            let directionY = forceDirectionY * force * this.density;
+
+            if (distance < mouse.radius) {
+                this.x -= directionX;
+                this.y -= directionY;
+            } else {
+                if (this.x !== this.baseX) {
+                    let dx = this.x - this.baseX;
+                    this.x -= dx / 10;
+                }
+                if (this.y !== this.baseY) {
+                    let dy = this.y - this.baseY;
+                    this.y -= dy / 10;
+                }
+            }
+        }
+    }
+
+    // Создаем сеть частиц в форме эллипса/сферы в центре
+    function initCanvas() {
+        particles = [];
+        let numParticles = (width * height) / 8000; 
+        for (let i = 0; i < numParticles; i++) {
+            // Распределение частиц к центру (имитация 3D скопления)
+            let angle = Math.random() * Math.PI * 2;
+            let radius = Math.sqrt(Math.random()) * (width > 768 ? 300 : 150);
+            let x = width/2 + Math.cos(angle) * radius;
+            let y = height/2 + Math.sin(angle) * radius;
+            particles.push(new Particle(x, y));
+        }
+    }
+
+    function animateCanvas() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+        }
+        requestAnimationFrame(animateCanvas);
+    }
+
+    initCanvas();
+    animateCanvas();
 </script>
 
 </body>
