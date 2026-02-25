@@ -2,164 +2,283 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOALA MUSIC — Музыкальный лейбл</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AURUM | Music Label</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;500;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* Сброс базовых стилей, чтобы нигде не вылезали белые полосы */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #000000;
+            --aurum: #D4AF37; /* Фирменный золотой */
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        body {
-            font-family: 'Raleway', sans-serif;
-            background-color: #000; /* Глубокий черный фон */
-            color: #fff;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Raleway', sans-serif; 
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 1. ИДЕАЛЬНОЕ СТЕКЛО (Glassmorphism) ДЛЯ ШАПКИ */
-        .glass-header {
+        /* 1. ПРЕМИАЛЬНАЯ ШАПКА (СТЕКЛО) */
+        header {
             position: fixed;
-            top: 15px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 1200px;
-            height: 60px;
+            max-width: 1100px;
+            height: 65px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 30px;
             z-index: 1000;
-            
-            /* Та самая магия стекла */
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
         }
 
-        .glass-header .logo {
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 1px;
-            color: #fff;
+        .logo { 
+            font-weight: 900; 
+            font-size: 20px; 
+            letter-spacing: 6px; 
+            text-transform: uppercase;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.7);
             text-decoration: none;
-        }
-
-        .glass-header nav {
-            display: flex;
-            gap: 30px;
-        }
-
-        .glass-header nav a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            transition: color 0.3s ease;
+            margin-left: 25px;
+            transition: 0.3s;
         }
 
-        .glass-header nav a:hover {
-            color: #5bee44; /* Твой кислотно-зеленый акцент при наведении */
-        }
+        .nav-links a:hover { color: var(--aurum); }
 
-        /* 2. ГЛАВНЫЙ ЭКРАН (HERO) С 3D */
+        /* 2. HERO СЕКЦИЯ */
         .hero {
             position: relative;
-            width: 100vw;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
-        /* Контейнер для 3D из Spline */
-        .spline-container {
+        .spline-wrap {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: 1;
         }
 
-        .spline-container iframe {
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(60px, 12vw, 160px);
+            font-weight: 900;
+            line-height: 0.85;
+            letter-spacing: -4px;
+            text-transform: uppercase;
+            text-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* 3. АРТИСТЫ (КАРУСЕЛЬ) */
+        .section-title {
+            padding: 80px 5% 40px;
+            font-size: clamp(32px, 5vw, 64px);
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .swiper {
+            width: 100%;
+            padding: 20px 5% 80px !important;
+        }
+
+        .artist-card {
+            position: relative;
+            width: 320px;
+            height: 480px;
+            background: #111;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .artist-card img {
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: cover;
+            filter: grayscale(1);
+            transition: 0.7s ease;
         }
 
-        /* Текст поверх 3D */
-        .hero-title {
-            position: relative;
-            z-index: 2; /* Текст выше 3D модели */
-            font-size: 8vw;
-            font-weight: 700;
-            text-align: center;
-            line-height: 0.9;
-            letter-spacing: -2px;
-            pointer-events: none; /* Чтобы мышка проходила сквозь текст и крутила 3D */
-            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Тень для читаемости */
+        .artist-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--aurum);
         }
 
-        /* Временный блок, чтобы было куда скроллить вниз */
-        .spacer {
-            height: 100vh;
+        .artist-card:hover img {
+            filter: grayscale(0);
+            transform: scale(1.05);
+        }
+
+        .artist-overlay {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-end;
+            padding: 30px;
+        }
+
+        .artist-overlay h3 {
             font-size: 24px;
-            color: #5bee44;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 4. БЕГУЩАЯ СТРОКА (ПАРТНЕРЫ) */
+        .marquee {
+            padding: 100px 0;
+            overflow: hidden;
+            background: #050505;
+            display: flex;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: scroll 30s linear infinite;
+        }
+
+        .marquee-content img {
+            height: 40px;
+            margin: 0 60px;
+            opacity: 0.4;
+            filter: brightness(0) invert(1);
+            transition: 0.3s;
+        }
+
+        .marquee-content img:hover { opacity: 1; }
+
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        footer {
+            padding: 40px 5%;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: 2px;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
 
-    <header class="glass-header">
-        <a href="#" class="logo">KOALA</a>
-        <nav>
-            <a href="#about">О нас</a>
-            <a href="#artists">Артисты</a>
-            <a href="#freshmen">Freshmen 2025</a>
-            <a href="#contacts">Контакты</a>
+    <header>
+        <div class="logo">AURUM</div>
+        <nav class="nav-links">
+            <a href="#artists">Artists</a>
+            <a href="#freshmen">Freshmen</a>
+            <a href="mailto:demo@aurum.music" style="color: var(--aurum)">Send Demo</a>
         </nav>
     </header>
 
     <section class="hero">
-        <div class="spline-container">
-            <iframe src="https://my.spline.design/untitled-aa4691f544b9c039811cdb নিরাপদe2868378/" frameborder="0"></iframe>
+        <div class="spline-wrap">
+            <iframe src="https://my.spline.design/untitled-aa4691f544b9c039811cdbcef2868378/" frameborder="0" width="100%" height="100%"></iframe>
         </div>
-        <h1 class="hero-title">KOALA<br>MUSIC</h1>
+        <div class="hero-content">
+            <h1>AURUM<br>MUSIC</h1>
+        </div>
     </section>
 
-    <section class="spacer" id="artists">
-        Здесь будет ахуевшая карусель артистов
-    </section>
+    <h2 id="artists" class="section-title">Main Roster</h2>
+    
+    <div class="swiper artistSwiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <div class="artist-card">
+                    <img src="https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000" alt="Artist">
+                    <div class="artist-overlay"><h3>Bulavin</h3></div>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="artist-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/T-Fest_%E2%80%94_official_press_photo_%E2%80%94_2025_%E2%80%94_by_manager.jpg" alt="Artist">
+                    <div class="artist-overlay"><h3>T-Fest</h3></div>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="artist-card">
+                    <img src="https://designer.kz/wp-content/uploads/2024/06/Skryptonite.webp" alt="Artist">
+                    <div class="artist-overlay"><h3>Скриптонит</h3></div>
+                </div>
+            </div>
+             <div class="swiper-slide">
+                <div class="artist-card">
+                    <img src="https://static.tildacdn.com/tild6165-6431-4464-a462-336662313637/IMG_2242.JPG" alt="Artist">
+                    <div class="artist-overlay"><h3>Lourenz</h3></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <h2 id="freshmen" class="section-title">Freshmen</h2>
+    <div class="marquee">
+        <div class="marquee-content">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png">
+            <img src="https://mobile-review.com/all/wp-content/uploads/2023/07/free-png.ru-462.png">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1024px-Amazon_logo.svg.png">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png">
+            <img src="https://mobile-review.com/all/wp-content/uploads/2023/07/free-png.ru-462.png">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1024px-Amazon_logo.svg.png">
+        </div>
+    </div>
+
+    <footer>© 2026 AURUM MUSIC. RECORD LABEL & DISTRIBUTION.</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    
     <script>
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Плавность как на дорогих сайтах
-            smooth: true,
-        });
-
+        // Плавный скролл
+        const lenis = new Lenis();
         function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
+          lenis.raf(time);
+          requestAnimationFrame(raf);
         }
         requestAnimationFrame(raf);
-    </script>
 
+        // Слайдер артистов
+        new Swiper(".artistSwiper", {
+            slidesPerView: "auto",
+            spaceBetween: 30,
+            freeMode: true,
+            grabCursor: true,
+        });
+    </script>
 </body>
 </html>
