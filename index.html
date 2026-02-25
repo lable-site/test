@@ -3,224 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PREMIUM LABEL | DIGITAL EXPERIENCE</title>
+    <title>AURUM LABEL | PREMIUM INTERFACE</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* ИМПОРТ ШРИФТА INTER */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;700;900&display=swap');
 
         :root {
-            --bg: #050505;
-            --glass: rgba(255, 255, 255, 0.02);
-            --glass-border: rgba(255, 255, 255, 0.07);
+            /* Глубокий фон с небольшим шумом для объема */
+            --bg: #020204;
+            /* LIQUID GLASS VARS - Настройки дорогого стекла */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            --glass-highlight: inset 0 1px 1px rgba(255,255,255,0.2);
+            --blur-strength: 60px;
             --accent: #ffffff;
-            --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { 
-            background: var(--bg); 
+            background: radial-gradient(circle at top left, #1a1a20 0%, var(--bg) 60%);
             color: #fff; 
             overflow-x: hidden; 
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ПЛАВНОЕ ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: var(--transition);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        /* УТИЛИТА: КЛАСС ДЛЯ ЖИДКОГО СТЕКЛА */
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-strength)) saturate(120%);
+            -webkit-backdrop-filter: blur(var(--blur-strength)) saturate(120%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow), var(--glass-highlight);
         }
 
-        /* 1. HERO СЕКЦИЯ (ГЛАВНЫЙ ЭКРАН) */
+        /* ПЛАВНОЕ ПОЯВЛЕНИЕ */
+        .reveal { opacity: 0; transform: translateY(40px); transition: var(--transition); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* 1. HERO СЕКЦИЯ */
         .hero {
-            height: 100vh;
+            min-height: 90vh; /* Чуть меньше 100, чтобы видеть начало контента */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
-            background: radial-gradient(circle at center, #111 0%, #050505 100%);
+            padding-top: 60px;
         }
-        .hero-logo {
-            width: 100px;
-            height: 100px;
-            background: #fff;
-            border-radius: 24px;
-            margin-bottom: 40px;
-            box-shadow: 0 0 60px rgba(255,255,255,0.05);
-            /* Анимация пульсации для дорогого вида */
-            animation: pulse 4s infinite ease-in-out;
+        /* Кастомный SVG Логотип */
+        .hero-logo-svg {
+            width: 140px;
+            height: 140px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 30px rgba(255,255,255,0.15));
+            animation: float 6s ease-in-out infinite;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         .hero-title {
-            font-size: clamp(24px, 5vw, 42px);
+            font-size: clamp(28px, 6vw, 52px);
             font-weight: 900;
             letter-spacing: 18px;
             text-transform: uppercase;
-            text-indent: 18px; /* Компенсация отступа справа */
+            text-indent: 18px;
+            background: linear-gradient(to bottom, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* ОБЩИЕ ПРАВИЛА ДЛЯ СЕКЦИЙ */
+        /* ОБЩИЕ СЕКЦИИ */
         .section {
-            padding: 140px 20px;
+            padding: 120px 20px;
             max-width: 1400px;
             margin: 0 auto;
         }
         .section-title {
             text-align: center;
-            font-size: 11px;
-            letter-spacing: 8px;
+            font-size: 12px;
+            letter-spacing: 6px;
             text-transform: uppercase;
-            opacity: 0.3;
-            margin-bottom: 60px;
-            font-weight: 300;
+            opacity: 0.4;
+            margin-bottom: 50px;
+            font-weight: 400;
         }
 
-        /* 2. БЛОК "О НАС" (GLASS CARD) */
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border: 1px solid var(--glass-border);
-            border-radius: 60px;
-            padding: 80px 40px;
+        /* 2. БЛОК "О НАС" */
+        .about-card {
+            border-radius: 50px;
+            padding: 70px 40px;
             text-align: center;
-            max-width: 900px;
+            max-width: 850px;
             margin: 0 auto;
         }
-        .glass-card p {
-            font-size: clamp(18px, 3vw, 24px);
-            line-height: 1.6;
+        .about-card p {
+            font-size: clamp(18px, 2.5vw, 26px);
+            line-height: 1.5;
             font-weight: 200;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.85);
         }
-        .glass-card b { font-weight: 700; color: #fff; }
+        .about-card b { font-weight: 700; color: #fff; }
 
         /* 3. СЛАЙДЕР АРТИСТОВ */
-        .swiper { width: 100%; padding: 40px 0 100px; }
-        .swiper-slide { width: auto; }
+        .swiper { width: 100%; padding: 30px 0 80px; }
+        .swiper-slide { width: auto; /* Важно для auto slidesPerView */ }
         
         .artist-card {
-            width: 320px;
-            height: 480px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 40px;
+            width: 310px; /* Фиксированный размер карточки */
+            height: 460px;
+            border-radius: 35px;
             overflow: hidden;
             position: relative;
             transition: var(--transition);
+            /* Стеклянная подложка */
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
         }
         .artist-photo {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            filter: grayscale(1) brightness(0.6);
-            transition: 1s ease;
+            object-fit: cover; /* Фотки заполняют карточку без искажений */
+            object-position: center top;
+            filter: grayscale(1) brightness(0.7) contrast(1.1);
+            transition: 0.8s ease;
         }
         .artist-info {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 40px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            bottom: 0; left: 0; width: 100%;
+            padding: 35px 25px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent);
+            transform: translateY(10px);
+            transition: var(--transition);
         }
         .artist-name {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 2px;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
             text-transform: uppercase;
         }
 
-        /* Эффект при фокусе на слайде */
-        .swiper-slide-active .artist-card { border-color: rgba(255,255,255,0.3); transform: scale(1.05); }
+        /* Активный слайд по центру */
+        .swiper-slide-active .artist-card { 
+            border-color: rgba(255,255,255,0.4); 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.3);
+            transform: scale(1.08); 
+        }
         .swiper-slide-active .artist-photo { filter: grayscale(0) brightness(1); }
+        .swiper-slide-active .artist-info { transform: translateY(0); }
 
-        /* 4. ПАРТНЕРЫ */
+        /* 4. ПАРТНЕРЫ (ГРИД) */
+        .partners-wrapper {
+            border-radius: 40px;
+            padding: 30px;
+        }
         .partners-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2px; /* Тонкие линии между партнерами */
-            background: var(--glass-border);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            overflow: hidden;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 30px;
+            align-items: center;
+            justify-items: center;
         }
         .partner-item {
-            height: 120px;
-            background: var(--bg);
+            height: 80px;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0.3;
-            transition: 0.5s;
+            transition: var(--transition);
+            padding: 15px;
+            border-radius: 20px;
         }
-        .partner-item:hover { opacity: 1; }
-        .partner-placeholder { width: 60px; height: 20px; background: #fff; border-radius: 2px; }
+        .partner-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: grayscale(1) opacity(0.4);
+            transition: 0.4s;
+        }
+        .partner-item:hover { background: rgba(255,255,255,0.05); }
+        .partner-item:hover img { filter: grayscale(0) opacity(1); }
 
-        /* 5. ФУТЕР */
-        .footer {
-            padding: 100px 20px;
-            text-align: center;
-            background: linear-gradient(to bottom, transparent, #0a0a0a);
+        /* 5. DEMO DROP SECTION (СВЯЗЬ) */
+        .demo-section { text-align: center; padding-bottom: 60px;}
+        .demo-card {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 50px 30px;
+            border-radius: 40px;
         }
-        .social-links { display: flex; justify-content: center; gap: 40px; margin-bottom: 50px; }
-        .social-links a { color: #fff; font-size: 24px; opacity: 0.4; transition: 0.3s; text-decoration: none; }
-        .social-links a:hover { opacity: 1; transform: translateY(-5px); }
-        .copyright { font-size: 10px; letter-spacing: 3px; opacity: 0.2; text-transform: uppercase; }
+        .demo-title { font-size: 24px; font-weight: 800; margin-bottom: 15px; letter-spacing: 2px; }
+        .demo-text { font-weight: 200; opacity: 0.7; margin-bottom: 30px; }
+        
+        .glass-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 20px 50px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-btn:hover {
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+        }
+
+        /* 6. ФУТЕР */
+        .footer {
+            padding: 80px 20px 40px;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            background: linear-gradient(to bottom, var(--bg), #000);
+        }
+        .social-links { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
+        .social-links a { 
+            color: #fff; font-size: 22px; opacity: 0.3; 
+            transition: 0.3s; text-decoration: none;
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; border-radius: 50%;
+            border: 1px solid transparent;
+        }
+        .social-links a:hover { 
+            opacity: 1; 
+            background: rgba(255,255,255,0.05);
+            border-color: var(--glass-border);
+        }
+        .copyright { font-size: 10px; letter-spacing: 4px; opacity: 0.2; text-transform: uppercase; }
 
     </style>
 </head>
 <body>
 
     <section class="hero">
-        <div class="hero-logo"></div>
-        <h1 class="hero-title">LABEL NAME</h1>
+        <svg class="hero-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10L10 90H90L50 10Z" fill="url(#paint0_linear)" fill-opacity="0.2" stroke="white" stroke-width="1.5"/>
+            <path d="M50 25L25 85H75L50 25Z" fill="url(#paint1_linear)" fill-opacity="0.3" stroke="white" stroke-width="0.5" style="backdrop-filter: blur(10px);"/>
+            <defs>
+                <linearGradient id="paint0_linear" x1="50" y1="10" x2="50" y2="90" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="white" stop-opacity="0.8"/>
+                    <stop offset="1" stop-color="white" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="paint1_linear" x1="50" y1="25" x2="50" y2="85" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="white"/>
+                    <stop offset="1" stop-color="white" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+        </svg>
+        <h1 class="hero-title">AURUM</h1>
     </section>
 
     <section class="section reveal">
-        <div class="glass-card">
-            <p><b>LABEL NAME</b> — это экосистема, где музыка обретает форму. Мы создаем будущее индустрии, объединяя <b>бескомпромиссное качество</b> и визуальную эстетику.</p>
+        <div class="about-card liquid-glass">
+            <p><b>AURUM</b> — это не просто лейбл. Это закрытый клуб, где визионерский звук встречается с премиальной эстетикой. Мы создаем наследие.</p>
         </div>
     </section>
 
     <section class="section reveal">
-        <h2 class="section-title">Артисты</h2>
+        <h2 class="section-title">Резиденты</h2>
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600" class="artist-photo">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/T-Fest_%E2%80%94_official_press_photo_%E2%80%94_2025_%E2%80%94_by_manager.jpg" class="artist-photo">
                         <div class="artist-info">
-                            <div class="artist-name">Artist One</div>
+                            <div class="artist-name">T-FEST</div>
                         </div>
                     </div>
                 </div>
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=600" class="artist-photo">
+                        <img src="https://designer.kz/wp-content/uploads/2024/06/Skryptonite.webp" class="artist-photo">
                         <div class="artist-info">
-                            <div class="artist-name">Artist Two</div>
+                            <div class="artist-name">СКРИПТОНИТ</div>
                         </div>
                     </div>
                 </div>
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://images.unsplash.com/photo-1520110120385-4267e72159ac?q=80&w=600" class="artist-photo">
+                        <img src="https://avatars.yandex.net/get-music-content/16464214/8bceb93a.p.24009925/m1000x1000" class="artist-photo">
                         <div class="artist-info">
-                            <div class="artist-name">Artist Three</div>
+                            <div class="artist-name">BULAVIN</div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="swiper-slide">
+                    <div class="artist-card">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600" class="artist-photo">
+                        <div class="artist-info">
+                            <div class="artist-name">GHOSTWRITER</div>
                         </div>
                     </div>
                 </div>
@@ -229,45 +311,63 @@
     </section>
 
     <section class="section reveal">
-        <h2 class="section-title">Партнеры</h2>
-        <div class="partners-grid">
-            <div class="partner-item"><div class="partner-placeholder"></div></div>
-            <div class="partner-item"><div class="partner-placeholder"></div></div>
-            <div class="partner-item"><div class="partner-placeholder"></div></div>
-            <div class="partner-item"><div class="partner-placeholder"></div></div>
+        <h2 class="section-title">Ключевые партнеры</h2>
+        <div class="partners-wrapper liquid-glass">
+            <div class="partners-grid">
+                <div class="partner-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Zvonko_Digital_Logo.svg/1280px-Zvonko_Digital_Logo.svg.png" alt="Zvonko">
+                </div>
+                <div class="partner-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/VK_Music_Full_Logo.svg/1280px-VK_Music_Full_Logo.svg.png" alt="VK Music">
+                </div>
+                <div class="partner-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Yandex_Music_icon.svg/2048px-Yandex_Music_icon.svg.png" alt="Yandex Music">
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer class="footer">
+    <section class="section demo-section reveal">
+        <div class="demo-card liquid-glass">
+            <h3 class="demo-title">WE ARE SCOUTING</h3>
+            <p class="demo-text">Твой звук готов к большой сцене? Отправь нам демо. Только лучшие треки, только приватные ссылки.</p>
+            <a href="mailto:demo@aurum.label" class="glass-btn liquid-glass">ОТПРАВИТЬ DEMO</a>
+        </div>
+    </section>
+
+    <footer class="footer reveal">
         <div class="social-links">
             <a href="#"><i class="fa-brands fa-instagram"></i></a>
             <a href="#"><i class="fa-brands fa-telegram"></i></a>
-            <a href="#"><i class="fa-regular fa-envelope"></i></a>
+            <a href="#"><i class="fa-brands fa-soundcloud"></i></a>
         </div>
-        <div class="copyright">© 2026 LABEL NAME • ALL RIGHTS RESERVED</div>
+        <div class="copyright">© 2026 AURUM LABEL • EST. MOSCOW</div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        /* ИНИЦИАЛИЗАЦИЯ СЛАЙДЕРА */
         const swiper = new Swiper(".mySwiper", {
             effect: "coverflow",
-            grabCursor: true,
+            grabCursor: true, // Курсор-рука
             centeredSlides: true,
             slidesPerView: "auto",
-            speed: 800,
+            speed: 800, // Плавная скорость перелистывания
+            mousewheel: { // ВКЛЮЧАЕМ ПРОКРУТКУ КОЛЕСИКОМ
+                enabled: true,
+                sensitivity: 1.5,
+            },
             coverflowEffect: {
-                rotate: 10,
+                rotate: 15,
                 stretch: 0,
-                depth: 200,
+                depth: 250, // Глубина 3D эффекта
                 modifier: 1,
-                slideShadows: false,
+                slideShadows: false, // Тени отключил, они дешевят стекло
             },
             loop: true,
         });
 
-        /* СКРИПТ ПОЯВЛЕНИЯ ПРИ СКРОЛЛЕ */
-        const observerOptions = { threshold: 0.1 };
+        /* Скрипт появления блоков при скролле */
+        const observerOptions = { threshold: 0.15 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -275,7 +375,6 @@
                 }
             });
         }, observerOptions);
-
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
 </body>
