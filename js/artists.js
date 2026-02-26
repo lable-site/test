@@ -9,7 +9,6 @@ const ArtistService = {
     async getArtists() {
         if (USE_MOCK) return mockArtists;
 
-        // Я исправил эту строчку, чтобы она не искала несуществующие колонки
         const res = await fetch(
             `${SUPABASE_URL}/rest/v1/artists?select=*&order=id`,
             { headers: { 'apikey': SUPABASE_KEY } }
@@ -51,16 +50,13 @@ function createArtistSlide(artist) {
 let swiperInstance = null;
 
 function initSwiper(count) {
-    // Уничтожаем предыдущий instance если есть
     if (swiperInstance) {
         swiperInstance.destroy(true, true);
         swiperInstance = null;
     }
 
-    // Нет артистов — ничего не делаем
     if (count === 0) return;
 
-    // Стрелки: отключаем если 1 артист
     const navNext = document.querySelector('.main-next');
     const navPrev = document.querySelector('.main-prev');
     if (count <= 1) {
@@ -72,10 +68,9 @@ function initSwiper(count) {
     }
 
     swiperInstance = new Swiper('.artistSwiper', {
-        // --- Основное ---
         effect: 'coverflow',
         grabCursor: count > 1,
-        centeredSlides: true,       // НЕ меняется в breakpoints никогда
+        centeredSlides: true,
         initialSlide: 0,
         loop: false,
         rewind: count > 1,
@@ -88,69 +83,60 @@ function initSwiper(count) {
         resistanceRatio: 0.85,
         threshold: 5,
 
-        // --- Coverflow ---
         coverflowEffect: {
             rotate: 0,
             depth: 200,
             modifier: 1,
             slideShadows: false,
-            stretch: 50
+            stretch: 30
         },
 
-        // --- Клавиатура ---
         keyboard: {
             enabled: true,
             onlyInViewport: true,
         },
 
-        // --- Навигация ---
         navigation: {
             nextEl: '.main-next',
             prevEl: '.main-prev',
         },
 
-        // --- Breakpoints ---
-        // ТОЛЬКО slidesPerView и coverflowEffect.stretch — centeredSlides не трогаем
+        // --- ВОТ ТУТ ГЛАВНАЯ МАГИЯ ---
         breakpoints: {
             0: {
                 slidesPerView: count === 1 ? 1 : 1.2,
-                coverflowEffect: { stretch: 30 }
+                coverflowEffect: { stretch: 30, depth: 200 } // Мобилка: глубокое 3D
             },
             768: {
                 slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 2,
-                coverflowEffect: { stretch: 45 }
+                coverflowEffect: { stretch: 20, depth: 80 } // Планшет: чуть поровнее
             },
             1024: {
                 slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 3,
-                coverflowEffect: { stretch: 50 }
+                coverflowEffect: { stretch: 0, depth: 0 } // Комп: отключаем 3D искажение!
             }
         }
     });
 }
 
-// ---- Главная функция (вызывается из main.js) ----
 export async function renderArtists() {
     const wrapper = document.getElementById('artists-wrapper');
     if (!wrapper) return;
 
     try {
         wrapper.innerHTML = '';
-
         const artists = await ArtistService.getArtists();
 
-        // 0 артистов — скрываем секцию
         if (!artists || artists.length === 0) {
             const section = document.getElementById('artists');
             if (section) section.style.display = 'none';
             return;
         }
 
-        // Рендерим слайды
         artists.forEach(artist => {
             wrapper.appendChild(createArtistSlide(artist));
         });
 
-        // Swiper инициализируется ТОЛЬКО после того как DOM готов
         initSwiper(artists.length);
 
     } catch (error) {
@@ -160,7 +146,6 @@ export async function renderArtists() {
     }
 }
 
-// ---- Экспорт instance для resize в main.js ----
 export function getSwiperInstance() {
     return swiperInstance;
 }
