@@ -7,7 +7,7 @@ import { resizeCanvas, animateParticles, initStars, animateStars } from './canva
 import { initReveal } from './animations.js';
 import { renderServices, renderStats, renderSiteConfig } from './content.js';
 
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = false; // Принудительно запускаем анимации всегда
 let lenis = null;
 let globalRafId = null;
 let lastTime = performance.now();
