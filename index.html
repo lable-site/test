@@ -44,10 +44,10 @@
         <a href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо"></a>
     </header>
 
+    <!-- 1. HERO -->
     <section class="hero" id="about">
         <canvas id="hero-canvas"></canvas>
         <div class="hero-overlay"></div>
-
         <div class="hero-content">
             <h1 class="hero-title">NATIVE</h1>
             <!-- Текст подтягивается из Supabase через content.js -->
@@ -55,9 +55,33 @@
         </div>
     </section>
 
+    <!-- 2. АРТИСТЫ -->
+    <section class="section" id="artists">
+        <div class="section-header reveal">
+            <h2 class="section-title">
+                <i class="fa-solid fa-microphone header-icon" aria-hidden="true"></i> АРТИСТЫ
+            </h2>
+        </div>
+        <!-- Стрелки удалены — навигация только свайпом -->
+        <div class="swiper artistSwiper reveal">
+            <div class="swiper-wrapper" id="artists-wrapper"></div>
+        </div>
+    </section>
+
+    <!-- 3. УСЛУГИ -->
+    <section class="section" id="services">
+        <div class="section-header reveal">
+            <h2 class="section-title">
+                <i class="fa-solid fa-briefcase header-icon" aria-hidden="true"></i> СПЕКТР УСЛУГ
+            </h2>
+        </div>
+        <div class="services-grid"></div>
+    </section>
+
+    <!-- 4. СТАТИСТИКА — перемещена после услуг -->
     <section class="section stats-section" id="stats">
         <!-- id="stats-grid" нужен content.js для динамической загрузки из Supabase -->
-        <!-- Карточки ниже — запасной вариант на случай если Supabase недоступен -->
+        <!-- Карточки ниже — запасной вариант если Supabase недоступен -->
         <div class="stats-grid" id="stats-grid">
             <div class="stat-card reveal">
                 <div class="stat-number" data-target="12" data-suffix="+">0</div>
@@ -74,28 +98,7 @@
         </div>
     </section>
 
-    <section class="section" id="artists">
-        <div class="section-header reveal">
-            <h2 class="section-title">
-                <i class="fa-solid fa-microphone header-icon" aria-hidden="true"></i> АРТИСТЫ
-            </h2>
-        </div>
-
-        <div class="swiper artistSwiper reveal">
-            <div class="swiper-wrapper" id="artists-wrapper"></div>
-        </div>
-    </section>
-
-    <section class="section" id="services">
-        <div class="section-header reveal">
-            <h2 class="section-title">
-                <i class="fa-solid fa-briefcase header-icon" aria-hidden="true"></i> СПЕКТР УСЛУГ
-            </h2>
-        </div>
-
-        <div class="services-grid"></div>
-    </section>
-
+    <!-- 5. СОЦСЕТИ -->
     <section class="section socials-section reveal">
         <!-- Текст подтягивается из Supabase через content.js -->
         <h2 class="section-title"></h2>
@@ -104,8 +107,8 @@
             <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
                 <i class="fa-brands fa-vk" aria-hidden="true"></i> ВКонтакте
             </a>
-            <!-- social-btn--telegram задаёт фиолетовый цвет через CSS, без inline-стилей -->
-            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn social-btn--telegram" aria-label="Telegram">
+            <!-- Все три кнопки теперь одинаковые — glassmorphism, без выделения Telegram -->
+            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Telegram">
                 <i class="fa-brands fa-telegram" aria-hidden="true"></i> Telegram
             </a>
             <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="YouTube">
