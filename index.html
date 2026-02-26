@@ -54,7 +54,7 @@
         .scroll-container { position: relative; z-index: 2; overflow: hidden; }
 
         /* =========================================
-           HEADER & INTERACTIVE LOGO
+           HEADER & LOGO
            ========================================= */
         .header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
@@ -69,24 +69,15 @@
 
         .brand-wrap {
             display: flex; align-items: center; gap: 18px;
-            text-decoration: none; perspective: 1000px; /* Для 3D эффекта */
+            text-decoration: none; color: var(--text-white);
         }
 
-        /* ЛОГОТИП: Контейнер для 3D-вращения */
-        .brand-logo-tilt {
-            width: 42px; height: 42px;
-            position: relative;
-            transform-style: preserve-3d;
-            will-change: transform; /* Оптимизация производительности */
-            transition: transform 0.1s ease-out; /* Плавное следование */
-        }
-
-        /* ЛОГОТИП: Само изображение (Инверсия черного в белый + свечение) */
+        /* ЛОГОТИП: Статичный, белый */
         .brand-logo-img {
-            width: 100%; height: 100%;
+            width: 42px; height: 42px;
             object-fit: contain;
-            /* МАГИЯ: Превращаем черный PNG в белый и добавляем фиолетовый неон */
-            filter: invert(1) drop-shadow(0 0 8px var(--n-purple-primary));
+            /* Превращаем черный PNG в белый */
+            filter: invert(1); 
         }
 
         .brand-text {
@@ -220,6 +211,21 @@
             font-family: 'Raleway', sans-serif; font-size: 30px;
             font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
         }
+        
+        .slider-nav { display: flex; gap: 15px; }
+        .nav-arrow {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 1px solid var(--n-glass-border);
+            background: var(--n-glass-bg);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(10px);
+        }
+        .nav-arrow:hover { background: var(--n-purple-primary); border-color: var(--n-purple-primary); }
+        .nav-arrow.swiper-button-disabled { opacity: 0.3; cursor: not-allowed; }
 
         /* =========================================
            SERVICES GRID (GLASS CARDS)
@@ -258,6 +264,50 @@
             color: var(--text-muted); font-size: 15px; margin-bottom: 12px;
         }
         .service-list li i { color: var(--n-purple-primary); font-size: 12px; }
+        .service-note {
+             margin-top: 20px; font-size: 12px; color: var(--text-muted);
+             border-top: 1px solid var(--n-glass-border); padding-top: 15px;
+        }
+
+        /* =========================================
+           PARTNERS (RELIABLE MARQUEE)
+           ========================================= */
+        .marquee-section {
+            padding: 80px 0;
+            background: #030107;
+            border-top: 1px solid var(--n-glass-border);
+            border-bottom: 1px solid var(--n-glass-border);
+            overflow: hidden;
+            display: flex;
+            /* Плавное растворение по краям */
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+
+        .marquee-track {
+            display: flex;
+            align-items: center;
+            gap: 100px; /* Отступы между лого */
+            width: max-content;
+            animation: marqueeScroll 25s linear infinite;
+        }
+
+        .marquee-track:hover { animation-play-state: paused; } /* Остановка при наведении */
+
+        .partner-logo {
+            height: 35px;
+            fill: #ffffff; /* Белый цвет SVG */
+            opacity: 0.3;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        
+        .partner-logo:hover { opacity: 1; fill: var(--n-purple-accent); transform: scale(1.1); }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
 
         /* =========================================
            FOOTER
@@ -303,6 +353,7 @@
             .nav-menu { display: none; } /* Скрываем меню на планшетах и ниже */
             .hero-title { font-size: 14vw; }
             .swiper-slide { width: 280px; height: 420px; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 20px; }
             .footer-content { flex-direction: column; gap: 30px; }
         }
     </style>
@@ -315,9 +366,7 @@
         
         <header class="header">
             <a href="#" class="brand-wrap">
-                <div class="brand-logo-tilt" id="tilt-logo">
-                    <img src="https://raw.githubusercontent.com/lable-site/test/refs/heads/main/logo.png" alt="NATIVE Logo" class="brand-logo-img">
-                </div>
+                <img src="https://raw.githubusercontent.com/lable-site/test/refs/heads/main/logo.png" alt="NATIVE Logo" class="brand-logo-img">
                 <span class="brand-text">NATIVE</span>
             </a>
             <nav class="nav-menu">
@@ -332,15 +381,23 @@
             <h1 class="hero-title reveal-up">NATIVE</h1>
             <div class="hero-description reveal-up" style="transition-delay: 0.2s;">
                 <p>
-                    Мы — музыкальное объединение нового типа. Мы стремимся быть не просто лейблом, а <strong>надежным партнером</strong> на каждом этапе вашего творческого пути.<br><br>
-                    От идеи до реализации, от студийной записи до масштабного промо — мы расширяем границы возможного для наших артистов.
+                    Мы всегда стремились быть не просто лейблом, а <strong>надежным партнером</strong> на каждом этапе творческого пути.<br><br>
+                    Чтобы предложить всем желающим артистам еще больше возможностей для роста, мы рады объявить, что серьезно расширили спектр наших услуг.
                 </p>
             </div>
         </section>
 
         <section class="section-block" id="artists">
-            <span class="section-label reveal-up">Main Roster</span>
-            <h2 class="section-heading reveal-up">Наши Артисты</h2>
+            <div class="section-header">
+                <div>
+                    <span class="section-label reveal-up">Main Roster</span>
+                    <h2 class="section-heading reveal-up">Наши Артисты</h2>
+                </div>
+                <div class="slider-nav reveal-up">
+                    <button class="nav-arrow main-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="nav-arrow main-next"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
             
             <div class="swiper artists-swiper reveal-up">
                 <div class="swiper-wrapper">
@@ -356,9 +413,9 @@
 
                     <div class="swiper-slide">
                         <div class="artist-card-wrap">
-                            <img src="https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" class="artist-img" alt="Я про рок">
+                            <img src="https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" class="artist-img" alt="я про рок">
                             <div class="artist-meta">
-                                <h3 class="artist-name">Я про рок</h3>
+                                <h3 class="artist-name">я про рок</h3>
                             </div>
                         </div>
                     </div>
@@ -377,53 +434,113 @@
         </section>
 
         <section class="section-block" id="services" style="background: #030107;">
-            <span class="section-label reveal-up">Services</span>
-            <h2 class="section-heading reveal-up">Спектр Услуг</h2>
+            <div class="section-header" style="padding-bottom: 20px;">
+                <div>
+                    <span class="section-label reveal-up">Services</span>
+                    <h2 class="section-heading reveal-up">Спектр Услуг</h2>
+                </div>
+            </div>
 
             <div class="services-grid">
                 <div class="service-card reveal-up">
-                    <i class="fa-solid fa-sliders service-icon"></i>
-                    <h3 class="service-title">Студия & Звук</h3>
+                    <i class="fa-solid fa-camera service-icon"></i>
+                    <h3 class="service-title">Фото и видео съёмка</h3>
                     <ul class="service-list">
-                        <li><i class="fa-solid fa-check"></i> Полный цикл производства трека</li>
-                        <li><i class="fa-solid fa-check"></i> Сведение и мастеринг</li>
-                        <li><i class="fa-solid fa-check"></i> Гострайтинг и топ-лайны</li>
-                        <li><i class="fa-solid fa-check"></i> Эксклюзивные биты</li>
+                        <li><i class="fa-solid fa-check"></i> обсуждение идей и концепций</li>
+                        <li><i class="fa-solid fa-check"></i> подбор референсов и согласование</li>
+                        <li><i class="fa-solid fa-check"></i> подбор локаций, образов, реквизита</li>
+                        <li><i class="fa-solid fa-check"></i> полноценная съемка, обработка и монтаж</li>
+                        <li><i class="fa-solid fa-check"></i> передача материалов в высоком разрешении</li>
+                        <li><i class="fa-solid fa-check"></i> съемка бэкстейджа</li>
                     </ul>
+                    <p class="service-note">Материалы для соц.сетей артиста, а также для использования в промо.</p>
                 </div>
+                
+                <div class="service-card reveal-up" style="transition-delay: 0.1s;">
+                    <i class="fa-solid fa-pen-nib service-icon"></i>
+                    <h3 class="service-title">Дизайн-пакет</h3>
+                    <ul class="service-list">
+                        <li><i class="fa-solid fa-check"></i> обложка к треку</li>
+                        <li><i class="fa-solid fa-check"></i> баннер VK (ПК и мобильная версия)</li>
+                        <li><i class="fa-solid fa-check"></i> YouTube баннер</li>
+                        <li><i class="fa-solid fa-check"></i> анимация обложки (квадрат и сторис)</li>
+                        <li><i class="fa-solid fa-check"></i> анимация на полный трек (16:9)</li>
+                    </ul>
+                    <p class="service-note">Материалы для соц.сетей артиста, а также для сниппетов и промо.</p>
+                </div>
+                
                 <div class="service-card reveal-up" style="transition-delay: 0.2s;">
-                    <i class="fa-solid fa-film service-icon"></i>
-                    <h3 class="service-title">Визуал & Продакшн</h3>
+                    <i class="fa-solid fa-chart-line service-icon"></i>
+                    <h3 class="service-title">Анализ и рекомендации</h3>
                     <ul class="service-list">
-                        <li><i class="fa-solid fa-check"></i> Разработка концепции клипов</li>
-                        <li><i class="fa-solid fa-check"></i> Съемка сниппетов (Reels/TikTok)</li>
-                        <li><i class="fa-solid fa-check"></i> Профессиональный монтаж и VFX</li>
-                        <li><i class="fa-solid fa-check"></i> Фотосессии и бэкстейдж</li>
+                        <li><i class="fa-solid fa-check"></i> по сведению и мастерингу</li>
+                        <li><i class="fa-solid fa-check"></i> по структуре, подаче и инструменталу</li>
+                        <li><i class="fa-solid fa-check"></i> консультация и помощь в оформлении юридических документов</li>
+                        <li><i class="fa-solid fa-check"></i> анализ визуала и креативов</li>
+                        <li><i class="fa-solid fa-check"></i> анализ образа и концепции артиста</li>
+                        <li><i class="fa-solid fa-check"></i> подбор референсов и обсуждение наилучшей стратегии</li>
+                        <li><i class="fa-solid fa-check"></i> составление и оформление райдера</li>
                     </ul>
                 </div>
-                <div class="service-card reveal-up" style="transition-delay: 0.4s;">
-                    <i class="fa-solid fa-bolt service-icon"></i>
-                    <h3 class="service-title">Дизайн & Брендинг</h3>
+
+                <div class="service-card reveal-up" style="transition-delay: 0.3s;">
+                    <i class="fa-solid fa-headphones service-icon"></i>
+                    <h3 class="service-title">Работа на студии</h3>
                     <ul class="service-list">
-                        <li><i class="fa-solid fa-check"></i> Обложки для релизов</li>
-                        <li><i class="fa-solid fa-check"></i> Оформление всех соцсетей</li>
-                        <li><i class="fa-solid fa-check"></i> Анимированные Canvas (Spotify)</li>
-                        <li><i class="fa-solid fa-check"></i> Разработка айдентики артиста</li>
+                        <li><i class="fa-solid fa-check"></i> гострайтинг</li>
+                        <li><i class="fa-solid fa-check"></i> создание бита</li>
+                        <li><i class="fa-solid fa-check"></i> запись и сведение трека</li>
+                        <li><i class="fa-solid fa-check"></i> фонограмма трека</li>
+                        <li><i class="fa-solid fa-check"></i> мультитрек проекта</li>
+                        <li><i class="fa-solid fa-check"></i> демоверсия трека</li>
+                        <li><i class="fa-solid fa-check"></i> финальная версия трека</li>
+                        <li><i class="fa-solid fa-check"></i> трек под ключ</li>
                     </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="marquee-section" id="partners">
+            <div class="marquee">
+                <div class="marquee-track">
+                    <svg class="partner-logo" viewBox="0 0 496 496" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm114.6 358.5c-4.5 7.4-14.1 9.7-21.5 5.2-58.8-35.9-132.8-44.1-220-24.1-8.5 1.9-17-3.4-18.9-11.9-1.9-8.5 3.4-17 11.9-18.9 95.8-21.9 177.3-12.7 243.3 28.2 7.4 4.5 9.7 14.1 5.2 21.5zm31.6-70.5c-5.7 9.2-18 12.1-27.2 6.4-67.9-41.6-172.5-54.3-255-29.6-10.4 3.1-21.4-2.8-24.5-13.2-3.1-10.4 2.8-21.4 13.2-24.5 94.6-28.3 210.7-14.1 287.1 33.7 9.2 5.7 12.1 18 6.4 27.2zm1.6-73.6c-81.5-48.4-215.9-52.9-293.7-29.2-12.6 3.8-26-3.3-29.8-15.9-3.8-12.6 3.3-26 15.9-29.8 91.5-27.9 240.8-22.6 335.7 34.1 11.4 6.8 15.1 21.5 8.3 32.9-6.8 11.5-21.5 15.2-32.9 8.4z"/>
+                    </svg>
+                    <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm110.1 161.4c1.2-15 11.3-28.8 25.4-36.2-7.1-10.4-18.2-17.6-30.8-19.5-13.3-2-26.6 2.6-35.3 10.4-8.8 7.8-19.1 11.5-29.8 10.6-13.8-1.1-26.6-7.8-36.7-18.6-22.3-24-58.8-26.5-84.4-6-19.5 15.7-32.5 39.4-36.5 66.5-7.7 52.3 18.2 103.5 62.5 123.6 12 5.5 24.8 8.1 37.8 7.8 13.9-.3 27.3-4.8 38.3-12.9 10.6-7.4 23.3-11.2 36.3-10.9 14.8.4 28.9 5.8 40.1 15.3 4.2 3.6 8.8 6.7 13.7 9.3-8.8-13.4-13.4-29.3-13.4-45.7 0-33.1 18.6-62.8 48.6-77.9-10.5-16.7-27.5-27.9-46.7-31-15.5-2.5-31.5 1.1-44 10-10.3 7.3-23 11-36 10.5-14.7-.4-28.5-6.5-38.9-17.1zm-85.3-26.8c12.2-15.1 19.3-34.5 18.9-54.4-19 1.7-36.8 10.3-49.3 23.9-11.2 12.2-17.9 28.5-18.5 45.4 19-1.3 36.8-9.4 48.9-22.3l.1-.2z" />
+                    </svg>
+                    <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    <svg class="partner-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.162 18.994c.609 0 .858-.406.858-.915v-2.203c0-1.016.452-1.22 1.107-1.22.474 0 1.288.237 1.627.746.542.813.542 2.592 2.395 2.592h2c1.152 0 1.74-.593 1.74-1.423 0-.813-.424-1.44-.881-2.016-.678-.847-1.604-1.457-1.604-2.135 0-.441.406-.847 1.05-1.457 1.051-1.017 2.068-2.339 2.068-3.796 0-1.085-.712-1.627-1.898-1.627h-2.135c-.644 0-1.085.203-1.373.847-.136.271-.475 1.017-1.051 2.05-.712 1.322-1.186 1.457-1.593 1.457-.61 0-.746-.406-.746-1.186V7.361c0-.983-.305-1.424-1.152-1.424h-3.356c-.678 0-1.119.406-1.119.813 0 .61 1.017.746 1.119 2.406v3.186c0 .813-.17.983-.712.983-.441 0-1.559-1.322-2.237-2.61-.271-.542-.576-1.152-.576-1.152s-.204-.474-.712-.474H2.4c-.95 0-1.424.474-1.424 1.118 0 .881 1.254 3.796 2.881 6.136C5.824 18.281 8.57 18.994 10.3 18.994h2.862z"/>
+                    </svg>
+                    <svg class="partner-logo" viewBox="0 0 496 496" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm114.6 358.5c-4.5 7.4-14.1 9.7-21.5 5.2-58.8-35.9-132.8-44.1-220-24.1-8.5 1.9-17-3.4-18.9-11.9-1.9-8.5 3.4-17 11.9-18.9 95.8-21.9 177.3-12.7 243.3 28.2 7.4 4.5 9.7 14.1 5.2 21.5zm31.6-70.5c-5.7 9.2-18 12.1-27.2 6.4-67.9-41.6-172.5-54.3-255-29.6-10.4 3.1-21.4-2.8-24.5-13.2-3.1-10.4 2.8-21.4 13.2-24.5 94.6-28.3 210.7-14.1 287.1 33.7 9.2 5.7 12.1 18 6.4 27.2zm1.6-73.6c-81.5-48.4-215.9-52.9-293.7-29.2-12.6 3.8-26-3.3-29.8-15.9-3.8-12.6 3.3-26 15.9-29.8 91.5-27.9 240.8-22.6 335.7 34.1 11.4 6.8 15.1 21.5 8.3 32.9-6.8 11.5-21.5 15.2-32.9 8.4z"/>
+                    </svg>
+                    <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm110.1 161.4c1.2-15 11.3-28.8 25.4-36.2-7.1-10.4-18.2-17.6-30.8-19.5-13.3-2-26.6 2.6-35.3 10.4-8.8 7.8-19.1 11.5-29.8 10.6-13.8-1.1-26.6-7.8-36.7-18.6-22.3-24-58.8-26.5-84.4-6-19.5 15.7-32.5 39.4-36.5 66.5-7.7 52.3 18.2 103.5 62.5 123.6 12 5.5 24.8 8.1 37.8 7.8 13.9-.3 27.3-4.8 38.3-12.9 10.6-7.4 23.3-11.2 36.3-10.9 14.8.4 28.9 5.8 40.1 15.3 4.2 3.6 8.8 6.7 13.7 9.3-8.8-13.4-13.4-29.3-13.4-45.7 0-33.1 18.6-62.8 48.6-77.9-10.5-16.7-27.5-27.9-46.7-31-15.5-2.5-31.5 1.1-44 10-10.3 7.3-23 11-36 10.5-14.7-.4-28.5-6.5-38.9-17.1zm-85.3-26.8c12.2-15.1 19.3-34.5 18.9-54.4-19 1.7-36.8 10.3-49.3 23.9-11.2 12.2-17.9 28.5-18.5 45.4 19-1.3 36.8-9.4 48.9-22.3l.1-.2z" />
+                    </svg>
+                    <svg class="partner-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    <svg class="partner-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.162 18.994c.609 0 .858-.406.858-.915v-2.203c0-1.016.452-1.22 1.107-1.22.474 0 1.288.237 1.627.746.542.813.542 2.592 2.395 2.592h2c1.152 0 1.74-.593 1.74-1.423 0-.813-.424-1.44-.881-2.016-.678-.847-1.604-1.457-1.604-2.135 0-.441.406-.847 1.05-1.457 1.051-1.017 2.068-2.339 2.068-3.796 0-1.085-.712-1.627-1.898-1.627h-2.135c-.644 0-1.085.203-1.373.847-.136.271-.475 1.017-1.051 2.05-.712 1.322-1.186 1.457-1.593 1.457-.61 0-.746-.406-.746-1.186V7.361c0-.983-.305-1.424-1.152-1.424h-3.356c-.678 0-1.119.406-1.119.813 0 .61 1.017.746 1.119 2.406v3.186c0 .813-.17.983-.712.983-.441 0-1.559-1.322-2.237-2.61-.271-.542-.576-1.152-.576-1.152s-.204-.474-.712-.474H2.4c-.95 0-1.424.474-1.424 1.118 0 .881 1.254 3.796 2.881 6.136C5.824 18.281 8.57 18.994 10.3 18.994h2.862z"/>
+                    </svg>
                 </div>
             </div>
         </section>
 
         <footer class="footer">
             <div class="footer-content">
-                <div class="footer-brand">NATIVE</div>
+                <div class="brand-name" style="font-size: 20px;">NATIVE</div>
                 <div class="footer-socials">
                     <a href="https://vk.ru/nativelabel" target="_blank" class="social-link"><i class="fa-brands fa-vk"></i></a>
-                    <a href="https://t.me/native_label" target="_blank" class="social-link"><i class="fa-brands fa-telegram"></i></a>
+                    <a href="https://t.me/native_label" target="_blank" class="social-link" style="background: linear-gradient(135deg, var(--n-purple-primary), #5a189a); border:none;"><i class="fa-brands fa-telegram"></i></a>
                     <a href="https://youtube.com/@nativelabel" target="_blank" class="social-link"><i class="fa-brands fa-youtube"></i></a>
                 </div>
             </div>
-            <div class="footer-bottom">© 2026 NATIVE LABEL. ALL RIGHTS RESERVED.</div>
+            <div class="footer-bottom">© 2026 NATIVE LABEL. ВСЕ ПРАВА ЗАЩИЩЕНЫ.</div>
         </footer>
 
     </div> <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -446,7 +563,7 @@
         }
         requestAnimationFrame(raf);
 
-        // Меняем фон шапки при скролле
+        // Затемнение шапки при скролле
         lenis.on('scroll', (e) => {
             const header = document.querySelector('.header');
             if (e.scroll > 50) header.classList.add('scrolled');
@@ -461,7 +578,7 @@
             entries.forEach(entry => {
                 if(entry.isIntersecting) {
                     entry.target.classList.add('in-view');
-                    revealObserver.unobserve(entry.target); // Анимируем только один раз
+                    revealObserver.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
@@ -469,25 +586,32 @@
         revealElements.forEach(el => revealObserver.observe(el));
 
         /* =========================================
-           3. ARTIST SWIPER (PREMIUM COVERFLOW)
+           3. ARTIST SWIPER (COVERFLOW С УПРАВЛЕНИЕМ МЫШЬЮ)
            ========================================= */
         new Swiper('.artists-swiper', {
             effect: 'coverflow',
             grabCursor: true,
             centeredSlides: true,
             slidesPerView: 'auto',
-            loop: true, // Бесконечная прокрутка
+            loop: true,
             speed: 800,
+            mousewheel: {
+                forceToAxis: true, // Включает прокрутку слайдера колесиком мыши (как ты просил)
+            },
             coverflowEffect: {
-                rotate: 0,      // Без поворота
-                stretch: 40,    // Наложение слайдов
-                depth: 350,     // Глубина перспективы
+                rotate: 0,
+                stretch: 40,
+                depth: 350,
                 modifier: 1,
-                slideShadows: false, // Отключаем стандартные тени, используем свои CSS
+                slideShadows: false, 
             },
             autoplay: {
                 delay: 4000,
                 disableOnInteraction: false,
+            },
+            navigation: {
+                nextEl: ".main-next",
+                prevEl: ".main-prev",
             },
             breakpoints: {
                 320: { slidesPerView: 1.4, coverflowEffect: { stretch: 20, depth: 200 } },
@@ -496,39 +620,7 @@
         });
 
         /* =========================================
-           4. INTERACTIVE 3D LOGO TILT (Слежение за мышью)
-           ========================================= */
-        const tiltLogo = document.getElementById('tilt-logo');
-        let constrains = 20; // Максимальный угол наклона
-
-        function transforms(x, y, el) {
-            let box = el.getBoundingClientRect();
-            let calcX = -(y - box.y - (box.height / 2)) / constrains;
-            let calcY = (x - box.x - (box.width / 2)) / constrains;
-            return `perspective(500px) rotateX(${calcX}deg) rotateY(${calcY}deg)`;
-        }
-
-        function transformElement(el, xyEl) {
-            el.style.transform  = transforms.apply(null, xyEl);
-        }
-
-        document.addEventListener('mousemove', (e) => {
-            if (window.innerWidth > 992) { // Работает только на десктопе
-                window.requestAnimationFrame(function(){
-                    transformElement(tiltLogo, [e.clientX, e.clientY, tiltLogo]);
-                });
-            }
-        });
-        
-        // Сброс положения при уходе мыши
-        document.addEventListener('mouseleave', () => {
-            if (window.innerWidth > 992) {
-                tiltLogo.style.transform = 'perspective(500px) rotateX(0deg) rotateY(0deg)';
-            }
-        });
-
-        /* =========================================
-           5. CUSTOM CANVAS BACKGROUND (Фиолетовые частицы)
+           4. CUSTOM CANVAS BACKGROUND (Фиолетовые частицы)
            ========================================= */
         const canvas = document.getElementById('webgl-canvas');
         const ctx = canvas.getContext('2d');
@@ -542,7 +634,7 @@
 
         function createParticles() {
             particles = [];
-            const count = window.innerWidth < 768 ? 50 : 120; // Меньше частиц на мобилках
+            const count = window.innerWidth < 768 ? 60 : 150; 
             for (let i = 0; i < count; i++) {
                 particles.push({
                     x: Math.random() * w,
@@ -551,7 +643,6 @@
                     speedX: (Math.random() - 0.5) * 0.3,
                     speedY: (Math.random() - 0.5) * 0.3,
                     opacity: Math.random() * 0.5 + 0.2,
-                    // Смешиваем белый и фиолетовый цвета
                     color: Math.random() > 0.7 ? '255, 255, 255' : '138, 43, 226'
                 });
             }
