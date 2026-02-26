@@ -1,17 +1,14 @@
 // ============================================================
-//  artists.js — загрузка и отображение артистов
+//  artists.js — загрузка артистов и инициализация слайдера
 // ============================================================
 
 import { USE_MOCK, mockArtists, SUPABASE_URL, SUPABASE_KEY } from './config.js';
 
-// ---- Сервис: откуда берём данные ----
+// ---- Сервис данных ----
 const ArtistService = {
     async getArtists() {
-        if (USE_MOCK) {
-            return mockArtists;
-        }
+        if (USE_MOCK) return mockArtists;
 
-        // --- Supabase (включается когда USE_MOCK = false) ---
         const res = await fetch(
             `${SUPABASE_URL}/rest/v1/artists?order=sort_order&is_visible=eq.true`,
             { headers: { 'apikey': SUPABASE_KEY } }
@@ -21,7 +18,7 @@ const ArtistService = {
     }
 };
 
-// ---- Создание карточки артиста (защита от XSS через textContent) ----
+// ---- Создание слайда (защита от XSS) ----
 function createArtistSlide(artist) {
     const slide = document.createElement('div');
     slide.className = 'swiper-slide';
@@ -30,8 +27,8 @@ function createArtistSlide(artist) {
     card.className = 'artist-card';
 
     const img = document.createElement('img');
-    img.src = artist.img || artist.photo_url; // поддержка обоих форматов (mock и Supabase)
-    img.alt = artist.name;
+    img.src = artist.img || artist.photo_url || '';
+    img.alt = artist.name || '';
     img.loading = 'lazy';
     img.decoding = 'async';
 
@@ -39,7 +36,7 @@ function createArtistSlide(artist) {
     info.className = 'artist-info';
 
     const title = document.createElement('h3');
-    title.textContent = artist.name;
+    title.textContent = artist.name || '';
 
     info.appendChild(title);
     card.appendChild(img);
@@ -49,34 +46,48 @@ function createArtistSlide(artist) {
     return slide;
 }
 
-// ---- Инициализация Swiper ----
+// ---- Swiper instance ----
 let swiperInstance = null;
 
 function initSwiper(count) {
+    // Уничтожаем предыдущий instance если есть
     if (swiperInstance) {
-        swiperInstance.destroy(true, false);
+        swiperInstance.destroy(true, true);
         swiperInstance = null;
     }
 
-    swiperInstance = new Swiper(".artistSwiper", {
-        effect: "coverflow",
-        grabCursor: true,
-        centeredSlides: true,
+    // Нет артистов — ничего не делаем
+    if (count === 0) return;
+
+    // Стрелки: отключаем если 1 артист
+    const navNext = document.querySelector('.main-next');
+    const navPrev = document.querySelector('.main-prev');
+    if (count <= 1) {
+        if (navNext) navNext.style.display = 'none';
+        if (navPrev) navPrev.style.display = 'none';
+    } else {
+        if (navNext) navNext.style.display = '';
+        if (navPrev) navPrev.style.display = '';
+    }
+
+    swiperInstance = new Swiper('.artistSwiper', {
+        // --- Основное ---
+        effect: 'coverflow',
+        grabCursor: count > 1,
+        centeredSlides: true,       // НЕ меняется в breakpoints никогда
         initialSlide: 0,
         loop: false,
-        rewind: true,
+        rewind: count > 1,
         allowTouchMove: count > 1,
         simulateTouch: count > 1,
-        slideToClickedSlide: true,
+        slideToClickedSlide: count > 1,
         speed: 800,
         watchSlidesProgress: true,
         touchRatio: 1.5,
         resistanceRatio: 0.85,
         threshold: 5,
-        keyboard: {
-            enabled: true,
-            onlyInViewport: true,
-        },
+
+        // --- Coverflow ---
         coverflowEffect: {
             rotate: 0,
             depth: 200,
@@ -84,58 +95,71 @@ function initSwiper(count) {
             slideShadows: false,
             stretch: 50
         },
-        navigation: {
-            nextEl: ".main-next",
-            prevEl: ".main-prev",
+
+        // --- Клавиатура ---
+        keyboard: {
+            enabled: true,
+            onlyInViewport: true,
         },
+
+        // --- Навигация ---
+        navigation: {
+            nextEl: '.main-next',
+            prevEl: '.main-prev',
+        },
+
+        // --- Breakpoints ---
+        // ТОЛЬКО slidesPerView и coverflowEffect.stretch — centeredSlides не трогаем
         breakpoints: {
             0: {
                 slidesPerView: count === 1 ? 1 : 1.2,
                 coverflowEffect: { stretch: 30 }
             },
             768: {
-                slidesPerView: count === 2 ? 1.2 : 2,
+                slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 2,
                 coverflowEffect: { stretch: 45 }
             },
             1024: {
-                slidesPerView: count === 2 ? 1.2 : 3,
+                slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 3,
                 coverflowEffect: { stretch: 50 }
             }
         }
     });
 }
 
-// ---- Главная функция: рендер артистов ----
+// ---- Главная функция (вызывается из main.js) ----
 export async function renderArtists() {
     const wrapper = document.getElementById('artists-wrapper');
     if (!wrapper) return;
 
     try {
-        wrapper.innerHTML = ''; // очищаем
+        wrapper.innerHTML = '';
 
         const artists = await ArtistService.getArtists();
 
+        // 0 артистов — скрываем секцию
         if (!artists || artists.length === 0) {
-            // Нет артистов — скрываем всю секцию, не показываем мусор
             const section = document.getElementById('artists');
             if (section) section.style.display = 'none';
             return;
         }
 
+        // Рендерим слайды
         artists.forEach(artist => {
-            const slide = createArtistSlide(artist);
-            wrapper.appendChild(slide);
+            wrapper.appendChild(createArtistSlide(artist));
         });
 
+        // Swiper инициализируется ТОЛЬКО после того как DOM готов
         initSwiper(artists.length);
 
     } catch (error) {
         console.error('Ошибка загрузки артистов:', error);
-        wrapper.innerHTML = ''; // скрываем при ошибке
+        const section = document.getElementById('artists');
+        if (section) section.style.display = 'none';
     }
 }
 
-// ---- Экспортируем instance чтобы main.js мог вызвать update при resize ----
+// ---- Экспорт instance для resize в main.js ----
 export function getSwiperInstance() {
     return swiperInstance;
 }
