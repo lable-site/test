@@ -50,19 +50,22 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1 class="hero-title">NATIVE</h1>
-            <!-- Текст подтягивается из Supabase через content.js -->
             <p class="hero-intro"></p>
         </div>
     </section>
 
     <!-- 2. АРТИСТЫ -->
-    <section class="section" id="artists">
+    <!-- artists-canvas — фон со звёздами. Управляется из canvas.js -->
+    <section class="section artists-section" id="artists">
+        <canvas id="artists-canvas"></canvas>
+
         <div class="section-header reveal">
             <h2 class="section-title">
                 <i class="fa-solid fa-microphone header-icon" aria-hidden="true"></i> АРТИСТЫ
             </h2>
         </div>
-        <!-- Стрелки удалены — навигация только свайпом -->
+
+        <!-- Стрелки удалены — навигация только свайпом и кликом -->
         <div class="swiper artistSwiper reveal">
             <div class="swiper-wrapper" id="artists-wrapper"></div>
         </div>
@@ -78,10 +81,9 @@
         <div class="services-grid"></div>
     </section>
 
-    <!-- 4. СТАТИСТИКА — перемещена после услуг -->
+    <!-- 4. СТАТИСТИКА — после услуг -->
     <section class="section stats-section" id="stats">
-        <!-- id="stats-grid" нужен content.js для динамической загрузки из Supabase -->
-        <!-- Карточки ниже — запасной вариант если Supabase недоступен -->
+        <!-- id="stats-grid" нужен content.js — не удалять -->
         <div class="stats-grid" id="stats-grid">
             <div class="stat-card reveal">
                 <div class="stat-number" data-target="12" data-suffix="+">0</div>
@@ -100,14 +102,12 @@
 
     <!-- 5. СОЦСЕТИ -->
     <section class="section socials-section reveal">
-        <!-- Текст подтягивается из Supabase через content.js -->
         <h2 class="section-title"></h2>
         <div class="social-links">
-            <!-- aria-label используется content.js для поиска кнопок — не удалять -->
+            <!-- aria-label используется content.js — не удалять -->
             <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
                 <i class="fa-brands fa-vk" aria-hidden="true"></i> ВКонтакте
             </a>
-            <!-- Все три кнопки теперь одинаковые — glassmorphism, без выделения Telegram -->
             <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Telegram">
                 <i class="fa-brands fa-telegram" aria-hidden="true"></i> Telegram
             </a>
