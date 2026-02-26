@@ -8,6 +8,11 @@
     --glass-bg: rgba(15, 10, 25, 0.4);
     --glass-border: rgba(255, 255, 255, 0.08);
     --transition: 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+
+    /* Единая система отступов — меняй здесь, применится везде */
+    --section-padding: 120px 0;
+    --section-header-gap: 80px;    /* Отступ под заголовком на десктопе */
+    --section-header-gap-mob: 50px; /* Отступ под заголовком на мобилке */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -41,6 +46,9 @@ html, body {
 
 .reveal { will-change: transform, opacity; }
 
+/* ============================================================
+   ХЕДЕР
+   ============================================================ */
 .header {
     position: fixed;
     top: 0; left: 0; width: 100%;
@@ -69,8 +77,8 @@ html, body {
 .header-logo:hover { transform: scale(1.05); }
 
 .logo-img {
-    width: 35px;
-    height: 35px;
+    width: 42px;   /* Было 35px — чуть крупнее, не ломает хедер */
+    height: 42px;
     object-fit: contain;
     filter: invert(1);
 }
@@ -113,10 +121,13 @@ html, body {
     text-decoration: none;
 }
 .btn-primary:hover {
-    box-shadow: 0 0 30px var(--native-purple);;
+    box-shadow: 0 0 30px var(--native-purple);
     transform: translateY(-2px);
 }
 
+/* ============================================================
+   HERO — Премиальный заголовок в стиле Apple Music
+   ============================================================ */
 .hero {
     position: relative;
     width: 100%;
@@ -157,12 +168,21 @@ html, body {
     font-size: clamp(60px, 12vw, 150px);
     font-weight: 900;
     line-height: 1;
-    letter-spacing: -2px;
+    /* Раздвинутые буквы — чистый технологичный стиль */
+    letter-spacing: clamp(8px, 2vw, 28px);
     margin-bottom: 30px;
-    background: linear-gradient(180deg, #ffffff 0%, var(--native-light) 100%);
+    /* Тонкий градиент: чистый белый → едва заметный лавандовый */
+    background: linear-gradient(
+        170deg,
+        #ffffff 0%,
+        #ffffff 40%,
+        rgba(216, 180, 254, 0.85) 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    background-clip: text;
+    /* Мягкая тень без "пластика" */
+    filter: drop-shadow(0 4px 32px rgba(138, 43, 226, 0.18));
     opacity: 0;
     transform: translateY(50px);
     animation: fadeUp 1s forwards 0.5s;
@@ -185,68 +205,28 @@ html, body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* ============================================================
+   СЕКЦИИ — единый вертикальный ритм
+   ============================================================ */
 .section {
     position: relative;
     width: 100%;
-    padding: 120px 0;
+    padding: var(--section-padding);
     z-index: 10;
 }
 
-.stats-section {
-    padding: 20px 0 40px;
-    z-index: 10;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 0 5%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.stat-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 25px 15px;
-    text-align: center;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-}
-
-.stat-number {
-    font-family: 'Raleway', sans-serif;
-    font-size: clamp(40px, 5vw, 64px);
-    font-weight: 900;
-    line-height: 1;
-    margin-bottom: 10px;
-    background: linear-gradient(180deg, #ffffff 0%, var(--native-light) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.stat-label {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* ЗАГОЛОВКИ: ВЕРНУЛИ ВЛЕВО И СДЕЛАЛИ ОТСТУП 80px */
+/* Заголовки секций — все левый край, единый отступ снизу */
 .section-header {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     text-align: left;
-    padding: 0 5% 80px; 
+    /* padding-bottom = отступ между заголовком и контентом */
+    padding: 0 5% var(--section-header-gap);
     max-width: 1600px;
     margin: 0 auto;
 }
 
-/* НОВОЕ: ЧТОБЫ ИКОНКА И ТЕКСТ СТОЯЛИ РОВНО */
 .section-title {
     font-family: 'Raleway', sans-serif;
     font-size: clamp(32px, 5vw, 64px);
@@ -254,15 +234,86 @@ html, body {
     text-transform: uppercase;
     display: flex;
     align-items: center;
-    gap: 20px; /* Расстояние между иконкой и текстом */
+    gap: 20px;
 }
 
-/* СТИЛЬ ДЛЯ БЕЛОЙ ИКОНКИ В ЗАГОЛОВКЕ */
 .header-icon {
     color: #ffffff;
-    font-size: 0.8em; /* Иконка чуть меньше текста */
+    font-size: 0.8em;
 }
 
+/* ============================================================
+   СТАТИСТИКА — Премиальный дизайн карточек
+   ============================================================ */
+.stats-section {
+    padding: 20px 0 60px;
+    z-index: 10;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 0 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stat-card {
+    position: relative;
+    /* Почти прозрачный фон — карточка "висит в воздухе" */
+    background: rgba(255, 255, 255, 0.02);
+    /* Верхняя граница чуть светлее — создаёт ощущение света сверху */
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 20px;
+    padding: 36px 20px 32px;
+    text-align: center;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+/* Тонкое фиолетовое свечение снизу — едва заметное */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--native-purple), transparent);
+    opacity: 0.5;
+}
+
+.stat-number {
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(44px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 12px;
+    /* Чистый белый с едва заметным лавандовым — без "дешёвого" градиента */
+    background: linear-gradient(160deg, #ffffff 30%, rgba(216, 180, 254, 0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+/* ============================================================
+   СЛАЙДЕР АРТИСТОВ
+   ============================================================ */
 .artistSwiper {
     width: 100%;
     padding-bottom: 60px !important;
@@ -295,7 +346,7 @@ html, body {
     box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     border: 1px solid var(--glass-border);
     transition: var(--transition);
-    transform: scale(0.85); 
+    transform: scale(0.85);
 }
 
 .swiper-slide-active .artist-card {
@@ -303,6 +354,7 @@ html, body {
     box-shadow: 0 20px 60px var(--native-purple-glow);
     transform: scale(1.05);
 }
+
 .artist-card img {
     width: 100%; height: 100%;
     object-fit: cover;
@@ -336,6 +388,9 @@ html, body {
     opacity: 1;
 }
 
+/* ============================================================
+   УСЛУГИ
+   ============================================================ */
 #services { background: #030106; }
 
 .services-grid {
@@ -426,12 +481,15 @@ html, body {
     line-height: 1.4;
 }
 
-/* ЗАГОЛОВОК ДЛЯ JOIN THE NATIVE СДЕЛАЛИ ПО ЦЕНТРУ ТАК КАК ОН УЖЕ В ТАКОЙ СЕКЦИИ */
+/* ============================================================
+   СОЦСЕТИ — единый стиль кнопок
+   ============================================================ */
 .socials-section {
     text-align: center;
     padding: 100px 5%;
     background: radial-gradient(circle at center bottom, #1a0b2e 0%, var(--native-dark) 70%);
 }
+
 .socials-section .section-title {
     justify-content: center;
 }
@@ -444,6 +502,7 @@ html, body {
     flex-wrap: wrap;
 }
 
+/* Базовый стиль для всех кнопок соцсетей */
 .social-btn {
     display: flex;
     align-items: center;
@@ -461,8 +520,25 @@ html, body {
 }
 
 .social-btn i { font-size: 20px; }
-.social-btn:hover { background: #fff; color: #000; transform: translateY(-5px); }
 
+/* Ховер одинаковый для всех */
+.social-btn:hover {
+    background: #fff;
+    color: #000;
+    border-color: transparent;
+    transform: translateY(-5px);
+}
+
+/* Telegram — акцентная кнопка, та же форма и размер что и остальные */
+/* Inline-стиль удалён из HTML, теперь всё здесь */
+.social-btn--telegram {
+    background: linear-gradient(135deg, var(--native-purple), #5a189a);
+    border-color: transparent;
+}
+
+/* ============================================================
+   ФУТЕР
+   ============================================================ */
 footer {
     padding: 40px 5%;
     display: flex;
@@ -474,38 +550,43 @@ footer {
     letter-spacing: 1px;
 }
 
+/* ============================================================
+   REVEAL АНИМАЦИИ
+   ============================================================ */
 .reveal {
     opacity: 0;
     transform: translateY(40px);
     transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
+
 .reveal.active {
     opacity: 1;
     transform: translateY(0);
 }
 
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 480px) {
     .section { padding: 80px 0; }
     .hero-title { font-size: clamp(40px, 12vw, 60px); }
-    /* ДЛЯ МОБИЛОК: ОТСТУП СТАЛ 50px */
-    .section-header { padding: 0 5% 50px; } 
+    .section-header { padding: 0 5% var(--section-header-gap-mob); }
 }
 
 @media (max-width: 768px) {
     .header { height: 70px; }
     .header-nav { display: none; }
 
-    /* ДЛЯ МОБИЛОК: Оставляем выравнивание влево */
     .section-header {
         flex-direction: row;
-        align-items: center; 
+        align-items: center;
         justify-content: flex-start;
-    }
-    .section-title {
-        gap: 15px; /* На мобилке расстояние между иконкой и текстом чуть меньше */
+        padding: 0 5% var(--section-header-gap-mob);
     }
 
-    .stats-grid { grid-template-columns: 1fr; gap: 15px; }
+    .section-title { gap: 15px; }
+
+    .stats-grid { grid-template-columns: 1fr; gap: 12px; }
     .stats-section { padding: 20px 0 40px; }
 
     .artist-info h3 { font-size: 24px; }
@@ -525,7 +606,8 @@ footer {
 
 @media (min-width: 1024px) {
     .hero-content { max-width: 1000px; }
-    .section-header, .services-grid { padding: 0 5%; }
+    /* ВАЖНО: section-header здесь НЕ переопределяем, чтобы сохранить padding-bottom */
+    .services-grid { padding: 0 5%; }
 }
 
 @media (min-width: 1440px) {
