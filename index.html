@@ -17,7 +17,6 @@
     <link rel="icon" type="image/png" href="./logo.png">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +40,8 @@
             <a href="#services">Услуги</a>
             <a href="#artists">Артисты</a>
         </nav>
-        <a href="https://t.me/music_for_native_bot" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо"></a>
+        <!-- Текст и ссылка подтягиваются из Supabase через content.js -->
+        <a href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо"></a>
     </header>
 
     <section class="hero" id="about">
@@ -50,12 +50,15 @@
 
         <div class="hero-content">
             <h1 class="hero-title">NATIVE</h1>
+            <!-- Текст подтягивается из Supabase через content.js -->
             <p class="hero-intro"></p>
         </div>
     </section>
 
     <section class="section stats-section" id="stats">
-        <div class="stats-grid">
+        <!-- id="stats-grid" нужен content.js для динамической загрузки из Supabase -->
+        <!-- Карточки ниже — запасной вариант на случай если Supabase недоступен -->
+        <div class="stats-grid" id="stats-grid">
             <div class="stat-card reveal">
                 <div class="stat-number" data-target="12" data-suffix="+">0</div>
                 <div class="stat-label">артистов</div>
@@ -79,8 +82,7 @@
         </div>
 
         <div class="swiper artistSwiper reveal">
-            <div class="swiper-wrapper" id="artists-wrapper">
-                </div>
+            <div class="swiper-wrapper" id="artists-wrapper"></div>
         </div>
     </section>
 
@@ -91,20 +93,22 @@
             </h2>
         </div>
 
-        <div class="services-grid">
-            </div>
+        <div class="services-grid"></div>
     </section>
 
     <section class="section socials-section reveal">
+        <!-- Текст подтягивается из Supabase через content.js -->
         <h2 class="section-title"></h2>
         <div class="social-links">
-            <a href="https://vk.ru/nativelabel" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
+            <!-- aria-label используется content.js для поиска кнопок — не удалять -->
+            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
                 <i class="fa-brands fa-vk" aria-hidden="true"></i> ВКонтакте
             </a>
-            <a href="https://t.me/native_label" target="_blank" rel="noopener noreferrer" class="social-btn" style="background: linear-gradient(135deg, #8a2be2, #5a189a); border:none;" aria-label="Telegram">
+            <!-- social-btn--telegram задаёт фиолетовый цвет через CSS, без inline-стилей -->
+            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn social-btn--telegram" aria-label="Telegram">
                 <i class="fa-brands fa-telegram" aria-hidden="true"></i> Telegram
             </a>
-            <a href="https://youtube.com/@nativelabel?si=EtcL2Ii0iGuvhe7S" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="YouTube">
+            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="YouTube">
                 <i class="fa-brands fa-youtube" aria-hidden="true"></i> YouTube
             </a>
         </div>
