@@ -50,11 +50,16 @@ export async function renderSiteConfig() {
         const settings = {};
         config.forEach(item => settings[item.key] = item.value);
 
-        // --- НОВОЕ: Меняем главный текст на первом экране ---
+        // --- Меняем текст на первом экране ---
         const heroIntro = document.querySelector('.hero-intro');
         if (heroIntro && settings.hero_text) {
-            // Заменяем обычные нажатия Enter в базе на HTML-переносы строк <br>
             heroIntro.innerHTML = settings.hero_text.replace(/\n/g, '<br>');
+        }
+
+        // --- НОВОЕ: Меняем заголовок перед соцсетями ---
+        const joinTitle = document.querySelector('.socials-section .section-title');
+        if (joinTitle && settings.join_text) {
+            joinTitle.textContent = settings.join_text;
         }
 
         // --- Меняем главную кнопку ---
