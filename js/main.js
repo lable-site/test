@@ -5,9 +5,8 @@
 import { renderArtists, getSwiperInstance } from './artists.js';
 import { resizeCanvas, initParticles, animateParticles } from './canvas.js';
 import { initReveal } from './animations.js';
-import { renderServices, renderSiteConfig } from './content.js';
+import { renderServices, renderStats, renderSiteConfig } from './content.js';
 
-// ---- Глобальные переменные ----
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let lenis = null;
 let globalRafId = null;
@@ -23,7 +22,7 @@ if (!prefersReducedMotion) {
     });
 }
 
-// ---- Единый RAF loop (canvas + lenis в одном месте) ----
+// ---- Единый RAF loop ----
 function renderLoop(time) {
     let dt = time - lastTime;
     lastTime = time;
@@ -37,7 +36,7 @@ function renderLoop(time) {
     globalRafId = requestAnimationFrame(renderLoop);
 }
 
-// ---- Пауза анимации когда вкладка не активна ----
+// ---- Пауза когда вкладка не активна ----
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         cancelAnimationFrame(globalRafId);
@@ -59,7 +58,7 @@ window.addEventListener('resize', () => {
     }, 250);
 });
 
-// ---- Запуск canvas и скролла сразу — они не зависят от данных ----
+// ---- Canvas запускаем сразу — не зависит от данных ----
 resizeCanvas();
 initParticles(prefersReducedMotion);
 
@@ -67,15 +66,14 @@ if (!prefersReducedMotion) {
     globalRafId = requestAnimationFrame(renderLoop);
 }
 
-// ---- Загрузка данных параллельно, initReveal ПОСЛЕ ----
-// Promise.allSettled — если одна функция упала, остальные всё равно выполнятся
-// Это важно: без этого один сбой базы мог обрушить всю страницу
+// ---- Данные грузим параллельно, initReveal — строго после ----
+// Promise.allSettled: даже если одна функция упала, остальные выполнятся
+// initReveal в .then() — анимации запускаются когда все карточки уже в DOM
 Promise.allSettled([
     renderArtists(),
     renderServices(),
+    renderStats(),
     renderSiteConfig(),
 ]).then(() => {
-    // Только теперь запускаем анимации появления —
-    // когда все карточки уже вставлены в DOM
     initReveal(prefersReducedMotion);
 });
