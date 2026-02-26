@@ -57,16 +57,6 @@ function initSwiper(count) {
 
     if (count === 0) return;
 
-    const navNext = document.querySelector('.main-next');
-    const navPrev = document.querySelector('.main-prev');
-    if (count <= 1) {
-        if (navNext) navNext.style.display = 'none';
-        if (navPrev) navPrev.style.display = 'none';
-    } else {
-        if (navNext) navNext.style.display = '';
-        if (navPrev) navPrev.style.display = '';
-    }
-
     swiperInstance = new Swiper('.artistSwiper', {
         effect: 'coverflow',
         grabCursor: count > 1,
@@ -96,24 +86,19 @@ function initSwiper(count) {
             onlyInViewport: true,
         },
 
-        navigation: {
-            nextEl: '.main-next',
-            prevEl: '.main-prev',
-        },
-
-        // --- ВОТ ТУТ ГЛАВНАЯ МАГИЯ ---
+        // --- ИСПРАВЛЕНЫ ЗАПЯТЫЕ ---
         breakpoints: {
             0: {
                 slidesPerView: count === 1 ? 1 : 1.2,
-                coverflowEffect: { stretch: 30, depth: 200 } // Мобилка: глубокое 3D
+                coverflowEffect: { stretch: 30, depth: 200 }
             },
             768: {
                 slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 2,
-                coverflowEffect: { stretch: 20, depth: 80 } // Планшет: чуть поровнее
+                coverflowEffect: { stretch: 20, depth: 80 }
             },
             1024: {
                 slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 3,
-                coverflowEffect: { stretch: 0, depth: 0 } // Комп: отключаем 3D искажение!
+                coverflowEffect: { stretch: 0, depth: 0 }, // <--- ВОТ ЭТА ЗАПЯТАЯ ВЕРНУЛАСЬ!
                 centeredSlides: false
             }
         }
