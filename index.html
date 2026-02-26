@@ -40,11 +40,9 @@
             <a href="#services">Услуги</a>
             <a href="#artists">Артисты</a>
         </nav>
-        <!-- Текст и ссылка подтягиваются из Supabase через content.js -->
         <a href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо"></a>
     </header>
 
-    <!-- 1. HERO -->
     <section class="hero" id="about">
         <canvas id="hero-canvas"></canvas>
         <div class="hero-overlay"></div>
@@ -54,10 +52,8 @@
         </div>
     </section>
 
-    <!-- 2. АРТИСТЫ -->
-    <!-- artists-canvas — фон со звёздами. Управляется из canvas.js -->
     <section class="section artists-section" id="artists">
-        <canvas id="artists-canvas"></canvas>
+        <canvas class="stars-canvas-bg"></canvas>
 
         <div class="section-header reveal">
             <h2 class="section-title">
@@ -65,14 +61,14 @@
             </h2>
         </div>
 
-        <!-- Стрелки удалены — навигация только свайпом и кликом -->
         <div class="swiper artistSwiper reveal">
             <div class="swiper-wrapper" id="artists-wrapper"></div>
         </div>
     </section>
 
-    <!-- 3. УСЛУГИ -->
     <section class="section" id="services">
+        <canvas id="services-canvas"></canvas>
+
         <div class="section-header reveal">
             <h2 class="section-title">
                 <i class="fa-solid fa-briefcase header-icon" aria-hidden="true"></i> СПЕКТР УСЛУГ
@@ -81,9 +77,9 @@
         <div class="services-grid"></div>
     </section>
 
-    <!-- 4. СТАТИСТИКА — после услуг -->
     <section class="section stats-section" id="stats">
-        <!-- id="stats-grid" нужен content.js — не удалять -->
+        <canvas class="stars-canvas-bg"></canvas>
+
         <div class="stats-grid" id="stats-grid">
             <div class="stat-card reveal">
                 <div class="stat-number" data-target="12" data-suffix="+">0</div>
@@ -100,11 +96,11 @@
         </div>
     </section>
 
-    <!-- 5. СОЦСЕТИ -->
     <section class="section socials-section reveal">
+        <canvas class="stars-canvas-bg"></canvas>
+
         <h2 class="section-title"></h2>
         <div class="social-links">
-            <!-- aria-label используется content.js — не удалять -->
             <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
                 <i class="fa-brands fa-vk" aria-hidden="true"></i> ВКонтакте
             </a>
