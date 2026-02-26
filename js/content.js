@@ -24,7 +24,7 @@ export async function renderServices() {
 
         services.forEach(service => {
             const card = document.createElement('div');
-            card.className = 'service-card reveal active';
+            card.className = 'service-card reveal';
 
             const icon = document.createElement('i');
             const safeIconClass = (service.icon || 'fa-solid fa-star').replace(/[^a-zA-Z0-9\-\s]/g, '');
