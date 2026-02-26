@@ -1,5 +1,9 @@
 // ============================================================
-//  canvas.js — анимация частиц на фоне hero-секции
+//  canvas.js — анимация частиц (hero) + звёзды (artists)
+// ============================================================
+
+// ============================================================
+//  HERO CANVAS — фиолетовые частицы на первом экране
 // ============================================================
 
 const canvas = document.getElementById('hero-canvas');
@@ -17,7 +21,6 @@ window.addEventListener('mousemove', (e) => {
     mouse.y = e.clientY;
 });
 
-// ---- Resize canvas ----
 export function resizeCanvas() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     width = heroSection.offsetWidth;
@@ -36,7 +39,6 @@ export function resizeCanvas() {
     mouse.y = height / 2;
 }
 
-// ---- Класс частицы ----
 class Particle {
     constructor(x, y) {
         this.x = x;
@@ -76,7 +78,6 @@ class Particle {
     }
 }
 
-// ---- Инициализация частиц ----
 export function initParticles(prefersReducedMotion) {
     particles = [];
 
@@ -98,7 +99,6 @@ export function initParticles(prefersReducedMotion) {
     }
 }
 
-// ---- Один кадр анимации (вызывается из RAF loop в main.js) ----
 export function animateParticles(dt) {
     if (!dt || particles.length === 0) return;
     const timeScale = dt / 16.66;
@@ -109,5 +109,111 @@ export function animateParticles(dt) {
     for (let i = 0; i < particles.length; i++) {
         particles[i].update(timeScale);
         particles[i].draw();
+    }
+}
+
+// ============================================================
+//  ARTISTS CANVAS — редкие медленные звёзды за слайдером
+// ============================================================
+
+const starsCanvas = document.getElementById('artists-canvas');
+let starsCtx = null;
+let starsW = 0, starsH = 0;
+let stars = [];
+let starsReady = false;
+
+// Инициализируем только если canvas существует в DOM
+if (starsCanvas) {
+    starsCtx = starsCanvas.getContext('2d', { alpha: true });
+    starsReady = true;
+}
+
+class Star {
+    constructor(w, h) {
+        this.reset(w, h, true);
+    }
+
+    reset(w, h, initial = false) {
+        // Случайная позиция по всей секции
+        this.x = Math.random() * w;
+        // При инициализации — случайная Y, при respawn — появляется сверху
+        this.y = initial ? Math.random() * h : -5;
+        // Звёзды маленькие — от 0.5 до 1.5px
+        this.size = Math.random() * 1.0 + 0.4;
+        // Очень медленное падение вниз
+        this.speedY = Math.random() * 0.15 + 0.05;
+        // Лёгкое горизонтальное дрейфование
+        this.speedX = (Math.random() - 0.5) * 0.08;
+        // Прозрачность — звёзды ненавязчивые
+        this.alpha = Math.random() * 0.4 + 0.15;
+        // Мерцание
+        this.twinkleSpeed = Math.random() * 0.008 + 0.003;
+        this.twinkleAngle = Math.random() * Math.PI * 2;
+        this.w = w;
+        this.h = h;
+    }
+
+    update(timeScale) {
+        this.y += this.speedY * timeScale;
+        this.x += this.speedX * timeScale;
+        this.twinkleAngle += this.twinkleSpeed * timeScale;
+
+        // Если ушла за низ или за края — respawn сверху
+        if (this.y > this.h + 5 || this.x < -5 || this.x > this.w + 5) {
+            this.reset(this.w, this.h, false);
+        }
+    }
+
+    draw(ctx) {
+        // Мерцание — альфа слегка пульсирует
+        const flicker = this.alpha + Math.sin(this.twinkleAngle) * 0.08;
+        const a = Math.max(0, Math.min(1, flicker));
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        // Чисто белые звёзды с очень лёгким холодным оттенком
+        ctx.fillStyle = `rgba(220, 215, 255, ${a})`;
+        ctx.fill();
+    }
+}
+
+export function initStars(prefersReducedMotion) {
+    if (!starsReady || !starsCtx) return;
+
+    const section = document.getElementById('artists');
+    if (!section) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    starsW = section.offsetWidth;
+    starsH = section.offsetHeight;
+
+    starsCanvas.width = starsW * dpr;
+    starsCanvas.height = starsH * dpr;
+    starsCanvas.style.width = starsW + 'px';
+    starsCanvas.style.height = starsH + 'px';
+
+    starsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    stars = [];
+    if (prefersReducedMotion) return;
+
+    // Немного звёзд — не много, не редко. ~35 для больших экранов, меньше для мобилок.
+    const amount = Math.min(35, Math.floor(starsW * starsH / 25000));
+
+    for (let i = 0; i < amount; i++) {
+        stars.push(new Star(starsW, starsH));
+    }
+}
+
+export function animateStars(dt) {
+    if (!starsReady || !starsCtx || stars.length === 0) return;
+    const timeScale = dt / 16.66;
+
+    // Прозрачный фон — звёзды поверх CSS-фона секции
+    starsCtx.clearRect(0, 0, starsW, starsH);
+
+    for (let i = 0; i < stars.length; i++) {
+        stars[i].update(timeScale);
+        stars[i].draw(starsCtx);
     }
 }
