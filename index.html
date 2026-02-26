@@ -68,8 +68,8 @@
             overflow: hidden;
         }
 
-        /* GPU Acceleration limited to strictly necessary elements */
-        .swiper-slide, .reveal {
+        /* 5. Performance - GPU Acceleration ONLY on reveal */
+        .reveal {
             will-change: transform, opacity;
         }
 
@@ -224,16 +224,16 @@
             z-index: 10;
         }
 
-        /* Premium Stats Section Styling */
+        /* 2. Minimalist Stats Section */
         .stats-section {
-            padding: 40px 0 80px;
+            padding: 20px 0 40px;
             z-index: 10;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
+            gap: 20px;
             padding: 0 5%;
             max-width: 1200px;
             margin: 0 auto;
@@ -243,17 +243,11 @@
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
-            padding: 40px 20px;
+            padding: 25px 15px;
             text-align: center;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            transition: var(--transition);
-        }
-
-        .stat-card:hover {
-            border-color: rgba(138, 43, 226, 0.5);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px var(--native-purple-glow);
+            /* Убран hover-эффект для визуальной легкости */
         }
 
         .stat-number {
@@ -261,7 +255,7 @@
             font-size: clamp(40px, 5vw, 64px);
             font-weight: 900;
             line-height: 1;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             background: linear-gradient(180deg, #ffffff 0%, var(--native-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -312,8 +306,12 @@
             padding-top: 20px !important;
         }
 
+        /* 1. ИСПРАВИТЬ ФОРМАТ КАРТОЧЕК АРТИСТОВ */
         .swiper-slide {
-            height: 500px;
+            height: auto; /* Высота подстраивается под карточку */
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: var(--transition);
             filter: grayscale(100%) brightness(0.4);
             transform: scale(0.85);
@@ -328,7 +326,9 @@
         }
 
         .artist-card {
-            width: 100%; height: 100%;
+            width: 100%;
+            max-width: 400px; /* Ограничение ширины */
+            aspect-ratio: 3 / 4; /* Портретный формат 3:4 */
             border-radius: 20px;
             overflow: hidden;
             position: relative;
@@ -538,12 +538,9 @@
             .slider-nav { align-self: flex-end; }
             
             /* Stats Section Mobile */
-            .stats-grid { grid-template-columns: 1fr; gap: 20px; }
-            .stats-section { padding: 40px 0; }
-            .stat-card { padding: 30px 20px; }
+            .stats-grid { grid-template-columns: 1fr; gap: 15px; }
+            .stats-section { padding: 20px 0 40px; }
 
-            /* Swiper Slide Fixes */
-            .swiper-slide { height: 400px; }
             .artist-info h3 { font-size: 24px; }
             
             /* Mobile Buttons UX Fix */
@@ -555,7 +552,7 @@
                 padding: 12px 20px;
                 justify-content: center;
             }
-            .social-btn:hover { transform: translateY(-2px); }
+            .social-btn:hover { transform: none; } /* Убран transform на мобильных */
 
             footer { flex-direction: column; gap: 15px; text-align: center; }
         }
@@ -752,30 +749,123 @@
     let lenis;
     let globalRafId;
     let lastTime = performance.now();
+    let swiperInstance = null; // Для управления Swiper
 
-    // === Architecture Ready for Supabase ===
+    // === 4. Architecture Ready for Supabase ===
     const mockArtists = [
         { name: "Pussykiller", img: "https://sun9-24.vkuserphoto.ru/s/v1/ig2/6C_Y4iNdHRUEOTyoZznezRjHJCy-Ejq8BpF5LgTrkfQveP4hmIXy_392B-6rIibYfrDO5_oYK_AVJg5qlCzsN2N0.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0" },
         { name: "Я про рок", img: "https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" },
         { name: "White Gallows", img: "https://sun9-53.vkuserphoto.ru/s/v1/ig2/_eZ8hJvlB5h-0ckNZ99RklPmMgfL7-cDR_8qcH3gqvjxdw2JQeFWHm8Q86cOBjZXMKoHxCuxVpO3n1iFbKQQys7s.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2560x2560&from=bu&cs=2560x0" }
     ];
 
-    function loadArtists() {
-        const wrapper = document.getElementById('artists-wrapper');
-        wrapper.innerHTML = mockArtists.map(artist => `
-            <div class="swiper-slide">
-                <div class="artist-card">
-                    <img src="${artist.img}" loading="lazy" decoding="async" alt="${artist.name}">
-                    <div class="artist-info">
-                        <h3>${artist.name}</h3>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+    const ArtistService = {
+        async getArtists() {
+            // В будущем заменяется на fetch из Supabase
+            return mockArtists; 
+        }
+    };
+
+    // 3. Создание DOM элемента с защитой от XSS
+    function createArtistSlide(artist) {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+
+        const card = document.createElement('div');
+        card.className = 'artist-card';
+
+        const img = document.createElement('img');
+        img.src = artist.img;
+        img.alt = artist.name;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+
+        const info = document.createElement('div');
+        info.className = 'artist-info';
+
+        const title = document.createElement('h3');
+        title.textContent = artist.name; // Защита XSS
+
+        info.appendChild(title);
+        card.appendChild(img);
+        card.appendChild(info);
+        slide.appendChild(card);
+
+        return slide;
     }
 
-    // Инициализация контента перед запуском Swiper
-    loadArtists();
+    // Инициализация Swiper с учетом количества
+    function initSwiper(count) {
+        if (swiperInstance) {
+            swiperInstance.destroy(true, true);
+        }
+
+        const isLoop = count >= 3;
+
+        swiperInstance = new Swiper(".artistSwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            loop: isLoop,
+            loopAdditionalSlides: isLoop ? Math.min(count, 3) : 0,
+            slideToClickedSlide: true,
+            speed: 800,
+            watchSlidesProgress: true,
+            touchRatio: 1.5,
+            resistanceRatio: 0.85,
+            threshold: 5,
+            keyboard: {
+                enabled: true,
+                onlyInViewport: true,
+            },
+            mousewheel: {
+                forceToAxis: true,
+                releaseOnEdges: true, 
+                sensitivity: 0.5,
+            },
+            coverflowEffect: {
+                rotate: 0,
+                depth: 200,
+                modifier: 1,
+                slideShadows: false,
+                stretch: 50
+            },
+            navigation: {
+                nextEl: ".main-next",
+                prevEl: ".main-prev",
+            },
+            breakpoints: {
+                0: {
+                    slidesPerView: count === 1 ? 1 : 1.2,
+                    coverflowEffect: { stretch: 30 }
+                },
+                768: {
+                    slidesPerView: count < 2 ? count : 2,
+                    coverflowEffect: { stretch: 45 }
+                },
+                1024: {
+                    slidesPerView: count < 3 ? count : 3,
+                    coverflowEffect: { stretch: 50 }
+                }
+            }
+        });
+    }
+
+    // Главная функция рендера артистов
+    async function renderArtists() {
+        const wrapper = document.getElementById('artists-wrapper');
+        wrapper.innerHTML = ''; 
+        
+        const artists = await ArtistService.getArtists();
+        
+        artists.forEach(artist => {
+            const slide = createArtistSlide(artist);
+            wrapper.appendChild(slide);
+        });
+
+        initSwiper(artists.length);
+    }
+
+    renderArtists(); // Запуск
 
     // === Unified Event Loop Architecture ===
     if (!prefersReducedMotion) {
@@ -810,7 +900,7 @@
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            const easeProgress = progress * (2 - progress); // easeOutQuad
+            const easeProgress = progress * (2 - progress); 
             const current = Math.floor(easeProgress * (end - start) + start);
             
             obj.innerHTML = current + (obj.dataset.suffix || "");
@@ -822,7 +912,7 @@
         window.requestAnimationFrame(step);
     }
 
-    // === Intersection Observer ===
+    // === Intersection Observer & will-change clean ===
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
@@ -836,6 +926,7 @@
                     animateValue(statNum, 0, parseInt(statNum.dataset.target, 10), 2000);
                 }
 
+                // 5. Очистка will-change после анимации
                 setTimeout(() => {
                     entry.target.style.willChange = 'auto';
                 }, 1000);
@@ -853,54 +944,6 @@
             if(statNum) statNum.innerHTML = statNum.dataset.target + (statNum.dataset.suffix || "");
         });
     }
-
-    // === Swiper Setup ===
-    new Swiper(".artistSwiper", {
-        effect: "coverflow",
-        grabCursor: true,
-        centeredSlides: true,
-        loop: true,
-        loopAdditionalSlides: 3,
-        slideToClickedSlide: true,
-        speed: 800,
-        watchSlidesProgress: true,
-        touchRatio: 1.5,
-        resistanceRatio: 0.85,
-        threshold: 5,
-        keyboard: {
-            enabled: true,
-            onlyInViewport: true,
-        },
-        mousewheel: {
-            forceToAxis: true,
-            releaseOnEdges: true, 
-            sensitivity: 0.5,
-        },
-        coverflowEffect: {
-            rotate: 0,
-            depth: 200,
-            modifier: 1,
-            slideShadows: false,
-        },
-        navigation: {
-            nextEl: ".main-next",
-            prevEl: ".main-prev",
-        },
-        breakpoints: {
-            0: {
-                slidesPerView: 1.2,
-                coverflowEffect: { stretch: 30 }
-            },
-            768: {
-                slidesPerView: 2,
-                coverflowEffect: { stretch: 45 }
-            },
-            1024: {
-                slidesPerView: 3,
-                coverflowEffect: { stretch: 50 }
-            }
-        }
-    });
 
     // === Canvas Initialization ===
     const canvas = document.getElementById('hero-canvas');
