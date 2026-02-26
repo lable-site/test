@@ -31,6 +31,7 @@ function createArtistSlide(artist) {
     img.alt = artist.name || '';
     img.loading = 'lazy';
     img.decoding = 'async';
+    // Запрещаем браузеру перехватывать событие перетаскивания картинки
     img.draggable = false; 
 
     const info = document.createElement('div');
@@ -61,11 +62,12 @@ function initSwiper(count) {
     swiperInstance = new Swiper('.artistSwiper', {
         effect: 'coverflow',
         loop: false,
+        rewind: true,
         grabCursor: true,
         allowTouchMove: true,
         simulateTouch: true,
         watchSlidesProgress: true,
-        watchOverflow: false,
+        watchOverflow: false, 
         initialSlide: 0,
         speed: 800,
         touchRatio: 1.5,
@@ -89,20 +91,19 @@ function initSwiper(count) {
             0: {
                 slidesPerView: count === 1 ? 1 : 1.2,
                 centeredSlides: true,
-                rewind: count > 1,
                 coverflowEffect: { stretch: 30, depth: 200 }
             },
             768: {
                 slidesPerView: count === 1 ? 1 : (count === 2 ? 1.5 : 2),
                 centeredSlides: true,
-                rewind: count > 2,
                 coverflowEffect: { stretch: 20, depth: 80 }
             },
             1024: {
-                slidesPerView: count <= 2 ? count : 2.8,
+                slidesPerView: count === 1 ? 1 : 2.6,
                 centeredSlides: false,
-                rewind: count > 1,
                 spaceBetween: 30,
+                // Секретный фикс: удлиняем трассу, чтобы слайды могли дотянуться до левого края без отскока
+                slidesOffsetAfter: count > 1 ? 800 : 0, 
                 coverflowEffect: { stretch: 0, depth: 0 }
             }
         }
