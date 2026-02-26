@@ -5,8 +5,8 @@
 import { renderArtists, getSwiperInstance } from './artists.js';
 import { resizeCanvas, initParticles, animateParticles } from './canvas.js';
 import { initReveal } from './animations.js';
-// ВОТ ЭТА НОВАЯ СТРОЧКА:
 import { renderServices, renderSiteConfig } from './content.js';
+
 // ---- Глобальные переменные ----
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let lenis = null;
@@ -27,7 +27,7 @@ if (!prefersReducedMotion) {
 function renderLoop(time) {
     let dt = time - lastTime;
     lastTime = time;
-    if (dt > 100) dt = 16.6; // защита от большого скачка после паузы
+    if (dt > 100) dt = 16.6;
 
     if (!prefersReducedMotion) {
         if (lenis) lenis.raf(time);
@@ -54,20 +54,28 @@ window.addEventListener('resize', () => {
     resizeTimeout = setTimeout(() => {
         resizeCanvas();
         initParticles(prefersReducedMotion);
-
         const swiper = getSwiperInstance();
         if (swiper) swiper.update();
     }, 250);
 });
 
-// ---- Запуск всего ----
+// ---- Запуск canvas и скролла сразу — они не зависят от данных ----
 resizeCanvas();
 initParticles(prefersReducedMotion);
-renderArtists();
-renderServices();     // Запускаем отрисовку услуг
-renderSiteConfig();   // Запускаем подмену ссылок
-initReveal(prefersReducedMotion);
 
 if (!prefersReducedMotion) {
     globalRafId = requestAnimationFrame(renderLoop);
 }
+
+// ---- Загрузка данных параллельно, initReveal ПОСЛЕ ----
+// Promise.allSettled — если одна функция упала, остальные всё равно выполнятся
+// Это важно: без этого один сбой базы мог обрушить всю страницу
+Promise.allSettled([
+    renderArtists(),
+    renderServices(),
+    renderSiteConfig(),
+]).then(() => {
+    // Только теперь запускаем анимации появления —
+    // когда все карточки уже вставлены в DOM
+    initReveal(prefersReducedMotion);
+});
