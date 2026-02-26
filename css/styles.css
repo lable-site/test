@@ -32,7 +32,6 @@ html, body {
     outline-offset: 4px;
     border-radius: 4px;
 }
-.nav-arrow:focus-visible { background: var(--native-purple); }
 
 .page-wrapper {
     position: relative;
@@ -236,47 +235,33 @@ html, body {
     letter-spacing: 2px;
 }
 
-/* ОБНОВИЛИ: ТЕПЕРЬ ЗАГОЛОВКИ ПО ЦЕНТРУ */
+/* ЗАГОЛОВКИ: ВЕРНУЛИ ВЛЕВО И СДЕЛАЛИ ОТСТУП 80px */
 .section-header {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    text-align: center;
-    padding: 0 5% 40px;
+    text-align: left;
+    padding: 0 5% 80px; 
     max-width: 1600px;
     margin: 0 auto;
 }
 
+/* НОВОЕ: ЧТОБЫ ИКОНКА И ТЕКСТ СТОЯЛИ РОВНО */
 .section-title {
     font-family: 'Raleway', sans-serif;
     font-size: clamp(32px, 5vw, 64px);
     font-weight: 900;
     text-transform: uppercase;
-}
-
-/* НОВОЕ: БЛОК ДЛЯ СТРЕЛОК */
-.slider-nav-wrapper {
     display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-    padding: 0 5%;
+    align-items: center;
+    gap: 20px; /* Расстояние между иконкой и текстом */
 }
 
-.slider-nav { display: flex; gap: 15px; }
-
-.nav-arrow {
-    width: 50px; height: 50px;
-    border-radius: 50%;
-    border: 1px solid var(--glass-border);
-    background: var(--glass-bg);
-    color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: var(--transition);
-    backdrop-filter: blur(10px);
+/* СТИЛЬ ДЛЯ БЕЛОЙ ИКОНКИ В ЗАГОЛОВКЕ */
+.header-icon {
+    color: #ffffff;
+    font-size: 0.8em; /* Иконка чуть меньше текста */
 }
-.nav-arrow:hover { background: var(--native-purple); border-color: var(--native-purple); }
-.nav-arrow.swiper-button-disabled { opacity: 0.3; cursor: not-allowed; }
 
 .artistSwiper {
     width: 100%;
@@ -441,10 +426,14 @@ html, body {
     line-height: 1.4;
 }
 
+/* ЗАГОЛОВОК ДЛЯ JOIN THE NATIVE СДЕЛАЛИ ПО ЦЕНТРУ ТАК КАК ОН УЖЕ В ТАКОЙ СЕКЦИИ */
 .socials-section {
     text-align: center;
     padding: 100px 5%;
     background: radial-gradient(circle at center bottom, #1a0b2e 0%, var(--native-dark) 70%);
+}
+.socials-section .section-title {
+    justify-content: center;
 }
 
 .social-links {
@@ -498,20 +487,23 @@ footer {
 @media (max-width: 480px) {
     .section { padding: 80px 0; }
     .hero-title { font-size: clamp(40px, 12vw, 60px); }
-    .section-header { padding: 0 5% 30px; }
+    /* ДЛЯ МОБИЛОК: ОТСТУП СТАЛ 50px */
+    .section-header { padding: 0 5% 50px; } 
 }
 
 @media (max-width: 768px) {
     .header { height: 70px; }
     .header-nav { display: none; }
 
-    /* ОБНОВИЛИ ДЛЯ МОБИЛОК: Всё по центру */
+    /* ДЛЯ МОБИЛОК: Оставляем выравнивание влево */
     .section-header {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center; 
-        gap: 20px;
+        justify-content: flex-start;
     }
-    .slider-nav { align-self: center; } 
+    .section-title {
+        gap: 15px; /* На мобилке расстояние между иконкой и текстом чуть меньше */
+    }
 
     .stats-grid { grid-template-columns: 1fr; gap: 15px; }
     .stats-section { padding: 20px 0 40px; }
@@ -542,7 +534,7 @@ footer {
 }
 
 @supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
-    .header, .service-card, .nav-arrow, .stat-card {
+    .header, .service-card, .stat-card {
         background: rgba(15, 10, 25, 0.85);
     }
 }
