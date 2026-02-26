@@ -15,9 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Raleway:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* =========================================
-           GLOBAL VARIABLES & SETUP
-           ========================================= */
         :root {
             --native-dark: #05020a;
             --native-purple: #8a2be2;
@@ -42,7 +39,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* КАСТОМНЫЙ СКРОЛЛБАР */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--native-dark); }
         ::-webkit-scrollbar-thumb { background: #2a1b42; border-radius: 10px; }
@@ -54,9 +50,6 @@
             overflow: hidden;
         }
 
-        /* =========================================
-           HEADER (GLASSMORPHISM)
-           ========================================= */
         .header {
             position: fixed;
             top: 0; left: 0; width: 100%;
@@ -84,12 +77,11 @@
 
         .header-logo:hover { transform: scale(1.05); }
 
-        /* Векторный логотип NATIVE (Белый) */
         .logo-img { 
             width: 35px; 
             height: 35px; 
             object-fit: contain;
-            filter: invert(1); /* Делаем черный логотип белым */
+            filter: invert(1); 
         }
         
         .logo-text { 
@@ -134,9 +126,6 @@
             transform: translateY(-2px);
         }
 
-        /* =========================================
-           HERO SECTION (3D CANVAS + INTRO)
-           ========================================= */
         .hero {
             position: relative;
             width: 100vw;
@@ -155,7 +144,6 @@
             z-index: 1;
         }
 
-        /* Тень поверх канваса для читаемости текста */
         .hero-overlay {
             position: absolute;
             inset: 0;
@@ -184,7 +172,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            /* Анимация появления */
             opacity: 0;
             transform: translateY(50px);
             animation: fadeUp 1s forwards 0.5s;
@@ -207,9 +194,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* =========================================
-           ARTISTS SECTION (COVERFLOW)
-           ========================================= */
         .section {
             position: relative;
             width: 100%;
@@ -258,13 +242,11 @@
             width: 350px; 
             height: 500px;
             transition: var(--transition);
-            /* По умолчанию: черно-белые, приглушенные, чуть меньше */
             filter: grayscale(100%) brightness(0.4);
             transform: scale(0.85);
             opacity: 0.5;
         }
 
-        /* АКТИВНЫЙ (ЦЕНТРАЛЬНЫЙ) СЛАЙД */
         .swiper-slide-active {
             filter: grayscale(0%) brightness(1);
             transform: scale(1.05);
@@ -320,14 +302,11 @@
             opacity: 1;
         }
 
-        /* =========================================
-           SERVICES SECTION (GLASS CARDS)
-           ========================================= */
         #services { background: #030106; }
         
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             padding: 0 5%;
             max-width: 1600px;
@@ -344,9 +323,10 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Декоративный блик внутри карточки */
         .service-card::before {
             content: '';
             position: absolute;
@@ -385,6 +365,7 @@
             flex-direction: column;
             gap: 12px;
             margin-bottom: 30px;
+            flex-grow: 1;
         }
 
         .service-card li {
@@ -411,9 +392,6 @@
             line-height: 1.4;
         }
 
-        /* =========================================
-           SOCIALS & CONTACTS
-           ========================================= */
         .socials-section {
             text-align: center;
             padding: 100px 5%;
@@ -447,9 +425,6 @@
         .social-btn i { font-size: 20px; }
         .social-btn:hover { background: #fff; color: #000; transform: translateY(-5px); }
 
-        /* =========================================
-           FOOTER
-           ========================================= */
         footer {
             padding: 40px 5%;
             display: flex;
@@ -461,9 +436,6 @@
             letter-spacing: 1px;
         }
 
-        /* =========================================
-           АНИМАЦИИ ПРИ СКРОЛЛЕ (REVEAL)
-           ========================================= */
         .reveal {
             opacity: 0;
             transform: translateY(40px);
@@ -474,12 +446,9 @@
             transform: translateY(0);
         }
 
-        /* =========================================
-           MOBILE ADAPTATION
-           ========================================= */
         @media (max-width: 768px) {
             .header { height: 70px; }
-            .header-nav { display: none; } /* На мобилках меню прячем */
+            .header-nav { display: none; } 
             
             .section-header { 
                 flex-direction: column; 
@@ -489,7 +458,7 @@
             .slider-nav { align-self: flex-end; }
             
             .swiper-slide { 
-                width: 280px; /* Карточки адаптированы под телефон */
+                width: 280px; 
                 height: 400px; 
             }
             .artist-info h3 { font-size: 24px; }
@@ -513,7 +482,7 @@
             <a href="#services">Услуги</a>
             <a href="#artists">Артисты</a>
         </nav>
-        <a href="https://t.me/native_label" target="_blank" class="btn-primary">Связь в TG</a>
+        <a href="https://t.me/music_for_native_bot" target="_blank" class="btn-primary">ОТПРАВИТЬ ДЕМО</a>
     </header>
 
     <section class="hero" id="about">
@@ -659,7 +628,7 @@
 
     <footer>
         <div>© 2026 NATIVE LABEL. ALL RIGHTS RESERVED.</div>
-        <div>DESIGNED FOR EXCELLENCE</div>
+        <div>ДЕМОНСТРАЦИЯ ОФИЦИАЛЬНОГО САЙТА ЛЕЙБЛА</div>
     </footer>
 
 </div>
@@ -668,9 +637,6 @@
 <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 
 <script>
-    /* =========================================
-       1. ПЛАВНЫЙ СКРОЛЛ (LENIS)
-       ========================================= */
     const lenis = new Lenis({
         duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -684,9 +650,6 @@
     }
     requestAnimationFrame(raf);
 
-    /* =========================================
-       2. АНИМАЦИИ ПОЯВЛЕНИЯ ПРИ СКРОЛЛЕ
-       ========================================= */
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
@@ -699,9 +662,6 @@
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    /* =========================================
-       3. СЛАЙДЕР АРТИСТОВ (COVER FLOW - ЦЕНТР) + ФИКС ДЛЯ КОЛЕСИКА МЫШИ
-       ========================================= */
     new Swiper(".artistSwiper", {
         effect: "coverflow",
         grabCursor: true,
@@ -710,12 +670,12 @@
         speed: 800,
         slidesPerView: "auto",
         mousewheel: {
-            forceToAxis: true, // ФИКС: Позволяет крутить слайдер колесиком мыши на ПК
+            forceToAxis: true,
         },
         coverflowEffect: {
             rotate: 0,
-            stretch: 50, // Наложение карточек друг на друга
-            depth: 200, // Уход в глубину
+            stretch: 50,
+            depth: 200,
             modifier: 1,
             slideShadows: false,
         },
@@ -725,9 +685,6 @@
         }
     });
 
-    /* =========================================
-       4. КАСТОМНЫЙ 3D CANVAS (ВОЛНЫ ЧАСТИЦ)
-       ========================================= */
     const canvas = document.getElementById('hero-canvas');
     const ctx = canvas.getContext('2d');
     let width, height, particles;
@@ -739,7 +696,6 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Отслеживание мыши для частиц
     const mouse = { x: width / 2, y: height / 2, radius: 150 };
     window.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
@@ -755,7 +711,6 @@
             this.size = Math.random() * 2.5 + 0.5;
             this.density = (Math.random() * 30) + 1;
             this.angle = Math.random() * 360;
-            // Фиолетовые оттенки NATIVE
             this.color = `rgba(${100 + Math.random()*50}, ${30 + Math.random()*40}, ${200 + Math.random()*55}, ${Math.random() * 0.8 + 0.2})`;
         }
 
@@ -768,11 +723,9 @@
         }
 
         update() {
-            // Легкое "дыхание" частиц
             this.angle += 0.02;
             this.baseY += Math.sin(this.angle) * 0.5;
 
-            // Взаимодействие с мышью
             let dx = mouse.x - this.x;
             let dy = mouse.y - this.y;
             let distance = Math.sqrt(dx * dx + dy * dy);
@@ -784,11 +737,9 @@
                 let directionX = forceDirectionX * force * this.density;
                 let directionY = forceDirectionY * force * this.density;
                 
-                // Частицы убегают от мыши
                 this.x -= directionX;
                 this.y -= directionY;
             } else {
-                // Возврат на базу
                 if (this.x !== this.baseX) {
                     let dx = this.x - this.baseX;
                     this.x -= dx / 15;
@@ -803,15 +754,12 @@
 
     function initParticles() {
         particles = [];
-        // Формируем математическую форму (две волны)
         let amount = width < 768 ? 400 : 1000;
         for (let i = 0; i < amount; i++) {
             let x = Math.random() * width;
-            // Создаем форму волны (синусоида) по центру экрана
             let wave1 = height / 2 + Math.sin(x * 0.005) * 150;
             let wave2 = height / 2 + Math.cos(x * 0.005) * 150;
             
-            // Разброс вокруг волны
             let y = (Math.random() > 0.5 ? wave1 : wave2) + (Math.random() * 100 - 50);
             
             particles.push(new Particle(x, y));
@@ -830,7 +778,6 @@
     initParticles();
     animateParticles();
 
-    // Перерисовка при ресайзе
     window.addEventListener('resize', () => {
         initParticles();
     });
