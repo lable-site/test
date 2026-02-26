@@ -31,6 +31,8 @@ function createArtistSlide(artist) {
     img.alt = artist.name || '';
     img.loading = 'lazy';
     img.decoding = 'async';
+    // ФИКС: Запрещаем браузеру перетаскивать саму картинку, чтобы работал свайп слайдера
+    img.draggable = false; 
 
     const info = document.createElement('div');
     info.className = 'artist-info';
@@ -60,6 +62,7 @@ function initSwiper(count) {
     swiperInstance = new Swiper('.artistSwiper', {
         effect: 'coverflow',
         grabCursor: true, // Курсор в виде руки теперь всегда
+        watchOverflow: false, // ФИКС: Принудительно разрешаем тянуть слайды, даже если их мало
         initialSlide: 0,
         loop: false,
         rewind: count > 1,
@@ -96,7 +99,7 @@ function initSwiper(count) {
                 centeredSlides: true
             },
             1024: {
-                slidesPerView: 'auto', // Ширина карточек теперь берется из CSS
+                slidesPerView: 'auto', // Ширина карточек берется из CSS
                 spaceBetween: 30,      // Идеальный ровный зазор между фото
                 coverflowEffect: { stretch: 0, depth: 0 },
                 centeredSlides: false  // Выстраиваем их строго слева направо!
