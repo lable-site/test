@@ -215,6 +215,24 @@ html, body {
     z-index: 10;
 }
 
+/* Звёздные холсты и новые частицы — абсолютный фон за контентом */
+#services-canvas, .stars-canvas-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: transparent;
+}
+
+/* Защита контента от перекрытия канвасами */
+.section-header, .services-grid, .stats-grid, .social-links, .section-title {
+    position: relative;
+    z-index: 10;
+}
+
 .section-header {
     display: flex;
     justify-content: flex-start;
@@ -245,12 +263,6 @@ html, body {
    ============================================================ */
 .artists-section {
     overflow: visible;
-}
-
-#artists-canvas {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 0; pointer-events: none; background: transparent;
 }
 
 /* ============================================================
@@ -654,13 +666,11 @@ footer {
     }
 
     .hero-content { max-width: 1000px; }
-    /* ИЗМЕНЕНО: удален блок с фиксированной шириной 340px */
 }
 
 @media (min-width: 1440px) {
     .hero-content { max-width: 1100px; }
     .service-card { padding: 50px; }
-    /* ИЗМЕНЕНО: удален блок с фиксированной шириной 360px */
 }
 
 /* ============================================================
