@@ -15,18 +15,16 @@ export async function renderServices() {
         });
         const services = await res.json();
 
-        // Если в базе есть услуги, заменяем те, что в HTML
         if (services && services.length > 0) {
-            wrapper.innerHTML = ''; // Очищаем старые карточки
+            wrapper.innerHTML = ''; 
 
             services.forEach(service => {
-                // Магия: разбиваем текст описания по строкам (Enter) и делаем из них пункты списка
                 const listHtml = service.description
                     ? service.description.split('\n').filter(text => text.trim() !== '').map(text => `<li>${text.trim()}</li>`).join('')
                     : '';
 
                 const card = document.createElement('div');
-                card.className = 'service-card reveal active'; // Сразу активные, чтобы появилась анимация
+                card.className = 'service-card reveal active';
                 
                 card.innerHTML = `
                     <i class="${service.icon || 'fa-solid fa-star'} service-icon"></i>
@@ -49,18 +47,24 @@ export async function renderSiteConfig() {
         });
         const config = await res.json();
         
-        // Превращаем массив базы данных в удобный словарь
         const settings = {};
         config.forEach(item => settings[item.key] = item.value);
 
-        // --- Меняем главную кнопку "Отправить Демо" ---
+        // --- НОВОЕ: Меняем главный текст на первом экране ---
+        const heroIntro = document.querySelector('.hero-intro');
+        if (heroIntro && settings.hero_text) {
+            // Заменяем обычные нажатия Enter в базе на HTML-переносы строк <br>
+            heroIntro.innerHTML = settings.hero_text.replace(/\n/g, '<br>');
+        }
+
+        // --- Меняем главную кнопку ---
         const demoBtn = document.querySelector('.btn-primary');
         if (demoBtn) {
             if (settings.demo_link) demoBtn.href = settings.demo_link;
             if (settings.demo_text) demoBtn.textContent = settings.demo_text;
         }
 
-        // --- Меняем ссылки на соцсети в подвале ---
+        // --- Меняем ссылки на соцсети ---
         const socialLinks = document.querySelectorAll('.social-links .social-btn');
         socialLinks.forEach(link => {
             if (link.textContent.includes('ВКонтакте') && settings.vk_link) link.href = settings.vk_link;
