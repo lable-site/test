@@ -1,140 +1,694 @@
-// ============================================================
-//  artists.js — загрузка артистов и инициализация слайдера
-// ============================================================
+:root {
+    --native-dark: #05020a;
+    --native-purple: #8a2be2;
+    --native-purple-glow: rgba(138, 43, 226, 0.4);
+    --native-light: #d8b4fe;
+    --text-main: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --glass-bg: rgba(15, 10, 25, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --transition: 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 
-import { USE_MOCK, mockArtists, SUPABASE_URL, SUPABASE_KEY } from './config.js';
+    --section-padding: 120px 0;
+    --section-header-gap: 60px;
+    --section-header-gap-mob: 40px;
 
-// ---- Сервис данных ----
-const ArtistService = {
-    async getArtists() {
-        if (USE_MOCK) return mockArtists;
-
-        const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/artists?select=*&order=id`,
-            { headers: { 'apikey': SUPABASE_KEY } }
-        );
-        if (!res.ok) throw new Error('Supabase: не удалось загрузить артистов');
-        return res.json();
-    }
-};
-
-// ---- Создание слайда (защита от XSS) ----
-function createArtistSlide(artist) {
-    const slide = document.createElement('div');
-    slide.className = 'swiper-slide';
-
-    const card = document.createElement('div');
-    card.className = 'artist-card';
-
-    const img = document.createElement('img');
-    img.src = artist.img || artist.photo_url || '';
-    img.alt = artist.name || '';
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    // ФИКС: Запрещаем браузеру перетаскивать саму картинку, чтобы работал свайп слайдера
-    img.draggable = false; 
-
-    const info = document.createElement('div');
-    info.className = 'artist-info';
-
-    const title = document.createElement('h3');
-    title.textContent = artist.name || '';
-
-    info.appendChild(title);
-    card.appendChild(img);
-    card.appendChild(info);
-    slide.appendChild(card);
-
-    return slide;
+    /* Единый отступ для всех блоков контента */
+    --layout-x: 5%;
 }
 
-// ---- Swiper instance ----
-let swiperInstance = null;
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-function initSwiper(count) {
-    if (swiperInstance) {
-        swiperInstance.destroy(true, true);
-        swiperInstance = null;
-    }
-
-    if (count === 0) return;
-
-    swiperInstance = new Swiper('.artistSwiper', {
-        effect: 'coverflow',
-        grabCursor: true, // Курсор в виде руки теперь всегда
-        watchOverflow: false, // ФИКС: Принудительно разрешаем тянуть слайды, даже если их мало
-        initialSlide: 0,
-        loop: false,
-        rewind: count > 1,
-        allowTouchMove: true,
-        simulateTouch: true,
-        speed: 800,
-        watchSlidesProgress: true,
-        touchRatio: 1.5,
-        resistanceRatio: 0.85,
-        threshold: 5,
-
-        coverflowEffect: {
-            rotate: 0,
-            depth: 200,
-            modifier: 1,
-            slideShadows: false,
-            stretch: 30
-        },
-
-        keyboard: {
-            enabled: true,
-            onlyInViewport: true,
-        },
-
-        breakpoints: {
-            0: {
-                slidesPerView: count === 1 ? 1 : 1.2,
-                coverflowEffect: { stretch: 30, depth: 200 },
-                centeredSlides: true
-            },
-            768: {
-                slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 2,
-                coverflowEffect: { stretch: 20, depth: 80 },
-                centeredSlides: true
-            },
-            1024: {
-                slidesPerView: 'auto', // Ширина карточек берется из CSS
-                spaceBetween: 30,      // Идеальный ровный зазор между фото
-                coverflowEffect: { stretch: 0, depth: 0 },
-                centeredSlides: false  // Выстраиваем их строго слева направо!
-            }
-        }
-    });
+html, body {
+    width: 100%;
+    background-color: var(--native-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
 }
 
-export async function renderArtists() {
-    const wrapper = document.getElementById('artists-wrapper');
-    if (!wrapper) return;
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--native-dark); }
+::-webkit-scrollbar-thumb { background: #2a1b42; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--native-purple); }
 
-    try {
-        wrapper.innerHTML = '';
-        const artists = await ArtistService.getArtists();
+:focus-visible {
+    outline: 2px solid var(--native-purple);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
 
-        if (!artists || artists.length === 0) {
-            const section = document.getElementById('artists');
-            if (section) section.style.display = 'none';
-            return;
-        }
+.page-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
 
-        artists.forEach(artist => {
-            wrapper.appendChild(createArtistSlide(artist));
-        });
+.reveal { will-change: transform, opacity; }
 
-        initSwiper(artists.length);
+/* ============================================================
+   ХЕДЕР
+   ============================================================ */
+.header {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--layout-x);
+    z-index: 9999;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    transition: transform 0.4s ease;
+}
 
-    } catch (error) {
-        console.error('Ошибка загрузки артистов:', error);
-        const section = document.getElementById('artists');
-        if (section) section.style.display = 'none';
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: var(--transition);
+}
+.header-logo:hover { transform: scale(1.05); }
+
+.logo-img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    filter: invert(1);
+}
+
+.logo-text {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 5px;
+}
+
+.header-nav { display: flex; gap: 40px; }
+.header-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: 0.3s ease;
+}
+.header-nav a:hover {
+    color: var(--text-main);
+    text-shadow: 0 0 10px var(--native-purple);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--native-purple), #5a189a);
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+    min-width: 44px;
+    min-height: 44px;
+}
+.btn-primary:hover {
+    box-shadow: 0 0 30px var(--native-purple);
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+#hero-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, var(--native-dark) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 900px;
+    padding: 0 20px;
+    pointer-events: none;
+}
+
+.hero-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(60px, 12vw, 150px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: clamp(2px, 0.5vw, 8px);
+    margin-bottom: 30px;
+    background: linear-gradient(
+        170deg,
+        #ffffff 0%,
+        #ffffff 45%,
+        rgba(216, 180, 254, 0.8) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 4px 32px rgba(138, 43, 226, 0.15));
+    opacity: 0;
+    transform: translateY(50px);
+    animation: fadeUp 1s forwards 0.5s;
+}
+
+.hero-intro {
+    font-size: clamp(16px, 2vw, 22px);
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    font-weight: 300;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 1s forwards 0.8s;
+}
+.hero-intro strong { color: var(--text-main); font-weight: 500; }
+
+@keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   СЕКЦИИ — единый ритм
+   ============================================================ */
+.section {
+    position: relative;
+    width: 100%;
+    padding: var(--section-padding);
+    z-index: 10;
+}
+
+.section-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: left;
+    padding: 0 var(--layout-x) var(--section-header-gap);
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 900;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-icon {
+    color: #ffffff;
+    font-size: 0.8em;
+}
+
+/* ============================================================
+   СЕКЦИЯ АРТИСТОВ
+   ============================================================ */
+.artists-section {
+    overflow: visible;
+}
+
+#artists-canvas {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none; background: transparent;
+}
+
+/* ============================================================
+   СЛАЙДЕР АРТИСТОВ
+   ============================================================ */
+.artistSwiper {
+    width: 100%;
+    position: relative;
+    z-index: 1; 
+
+    padding-top: 20px !important;
+    padding-bottom: 70px !important;
+
+    /* СУПЕР-ФИКС: Математически вычисляем отступ, чтобы первая фотка
+       стояла МИЛЛИМЕТР В МИЛЛИМЕТР над первой карточкой услуг на любом экране! */
+    padding-left: max(var(--layout-x), calc((100vw - 1600px) / 2 + 5vw)) !important;
+    padding-right: var(--layout-x) !important;
+}
+
+.artistSwiper.swiper {
+    overflow: visible !important;
+}
+
+.swiper-slide {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: var(--transition);
+    filter: grayscale(100%) brightness(0.3);
+    opacity: 0.5;
+}
+
+.swiper-slide-active {
+    filter: grayscale(0%) brightness(1);
+    opacity: 1;
+    z-index: 10;
+}
+
+.artist-card {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 3 / 4;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--glass-border);
+    transition: var(--transition);
+    transform: scale(0.85);
+}
+
+.swiper-slide-active .artist-card {
+    border-color: rgba(138, 43, 226, 0.5);
+    box-shadow:
+        0 0 0 1px rgba(138, 43, 226, 0.2),   
+        0 0 25px 4px rgba(138, 43, 226, 0.3), 
+        0 0 60px 10px rgba(138, 43, 226, 0.1); 
+    transform: scale(1.05);
+}
+
+.artist-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.artist-info {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%;
+    padding: 40px 30px 30px;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+
+.artist-info h3 {
+    font-family: 'Raleway', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.swiper-slide-active .artist-info h3 {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ============================================================
+   УСЛУГИ
+   ============================================================ */
+#services { background: #030106; }
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 0 var(--layout-x); 
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.service-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, var(--native-purple-glow) 0%, transparent 50%);
+    opacity: 0;
+    transition: var(--transition);
+    pointer-events: none;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(138, 43, 226, 0.5);
+}
+.service-card:hover::before { opacity: 0.15; }
+
+.service-icon {
+    font-size: 40px;
+    color: var(--native-light);
+    margin-bottom: 25px;
+}
+
+.service-card h3 {
+    font-family: 'Raleway', sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.service-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-grow: 1;
+}
+
+.service-card li {
+    font-size: 14px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+}
+
+.service-card li::before {
+    content: '•';
+    color: var(--native-purple);
+    font-size: 20px;
+    line-height: 0.8;
+    flex-shrink: 0;
+}
+
+.service-footer {
+    margin-top: auto;
+    font-size: 12px;
+    color: #fff;
+    opacity: 0.5;
+    line-height: 1.4;
+}
+
+/* ============================================================
+   СТАТИСТИКА
+   ============================================================ */
+.stats-section {
+    padding: 60px 0 80px;
+    z-index: 10;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 0 var(--layout-x);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stat-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 20px;
+    padding: 36px 20px 32px;
+    text-align: center;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--native-purple), transparent);
+    opacity: 0.5;
+}
+
+.stat-number {
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(44px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 12px;
+    background: linear-gradient(160deg, #ffffff 30%, rgba(216, 180, 254, 0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+/* ============================================================
+   СОЦСЕТИ
+   ============================================================ */
+.socials-section {
+    text-align: center;
+    padding: 100px var(--layout-x);
+    background: radial-gradient(circle at center bottom, #1a0b2e 0%, var(--native-dark) 70%);
+}
+
+.socials-section .section-title {
+    justify-content: center;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 35px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    transition: var(--transition);
+}
+
+.social-btn i { font-size: 20px; }
+
+.social-btn:hover {
+    background: #fff;
+    color: #000;
+    border-color: transparent;
+    transform: translateY(-5px);
+}
+
+/* ============================================================
+   ФУТЕР
+   ============================================================ */
+footer {
+    padding: 40px var(--layout-x);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--glass-border);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   REVEAL АНИМАЦИИ
+   ============================================================ */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================================
+   RESPONSIVE — МОБИЛКИ (до 768px)
+   ============================================================ */
+@media (max-width: 480px) {
+    .section { padding: 80px 0; }
+    .hero-title { font-size: clamp(40px, 12vw, 60px); }
+    .section-header { padding: 0 var(--layout-x) var(--section-header-gap-mob); }
+    .stats-section { padding: 40px 0 60px; }
+}
+
+@media (max-width: 768px) {
+    .header { height: 70px; }
+    .header-nav { display: none; }
+
+    .section-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0 var(--layout-x) var(--section-header-gap-mob);
+    }
+    .section-title { gap: 15px; }
+
+    .artistSwiper {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 10px !important;
+        padding-bottom: 50px !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .stats-section { padding: 40px 0 60px; }
+
+    .artist-info h3 { font-size: 24px; }
+
+    .social-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .social-btn {
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+        padding: 12px 20px;
+        justify-content: center;
+    }
+    .social-btn:hover { transform: none; }
+
+    footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
     }
 }
 
-export function getSwiperInstance() {
-    return swiperInstance;
+/* ============================================================
+   RESPONSIVE — ПЛАНШЕТ (768–1023px)
+   ============================================================ */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .artistSwiper {
+        padding-left: calc(var(--layout-x) / 2) !important;
+        padding-right: calc(var(--layout-x) / 2) !important;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — ДЕСКТОП (от 1024px)
+   ============================================================ */
+@media (min-width: 1024px) {
+    .hero-content { max-width: 1000px; }
+    
+    /* СУПЕР-ФИКС: Фиксируем ширину карточек на ПК, чтобы Swiper мог правильно считать скролл */
+    .swiper-slide {
+        width: 340px !important;
+    }
+}
+
+@media (min-width: 1440px) {
+    .hero-content { max-width: 1100px; }
+    .service-card { padding: 50px; }
+
+    /* На огромных экранах карточки чуть крупнее */
+    .swiper-slide {
+        width: 360px !important;
+    }
+}
+
+/* ============================================================
+   FALLBACK
+   ============================================================ */
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .header, .service-card, .stat-card, .social-btn {
+        background: rgba(15, 10, 25, 0.9);
+    }
+}
+
+/* ============================================================
+   ДОСТУПНОСТЬ
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .hero-title, .hero-intro {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
 }
