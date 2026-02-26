@@ -1,18 +1,6 @@
 // ============================================================
-//  canvas.js — анимация частиц (hero) + звёзды (artists)
+//  canvas.js — анимация частиц (hero, services) + звёзды
 // ============================================================
-
-// ============================================================
-//  HERO CANVAS — фиолетовые частицы на первом экране
-// ============================================================
-
-const canvas = document.getElementById('hero-canvas');
-const heroSection = document.getElementById('about');
-const ctx = canvas.getContext('2d', { alpha: false });
-
-const bgColor = '#05020a';
-let width, height;
-let particles = [];
 
 const mouse = { x: 0, y: 0, radius: 150 };
 
@@ -21,30 +9,103 @@ window.addEventListener('mousemove', (e) => {
     mouse.y = e.clientY;
 });
 
-export function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    width = heroSection.offsetWidth;
-    height = heroSection.offsetHeight;
+// ============================================================
+//  PARTICLES SYSTEM (Hero & Services)
+// ============================================================
 
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.width = width + 'px';
-    canvas.style.height = height + 'px';
+class ParticleSystem {
+    constructor(canvasId, type) {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) return;
+        
+        this.section = this.canvas.parentElement;
+        // Для Услуг делаем прозрачный фон, чтобы было видно CSS-подложку
+        this.ctx = this.canvas.getContext('2d', { alpha: type === 'services' });
+        this.type = type;
+        this.particles = [];
+        this.w = 0;
+        this.h = 0;
+        this.bgColor = type === 'hero' ? '#05020a' : null; 
+    }
 
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, width, height);
+    resize(prefersReducedMotion) {
+        if (!this.canvas) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.w = this.section.offsetWidth;
+        this.h = this.section.offsetHeight;
 
-    mouse.x = width / 2;
-    mouse.y = height / 2;
+        this.canvas.width = this.w * dpr;
+        this.canvas.height = this.h * dpr;
+        this.canvas.style.width = this.w + 'px';
+        this.canvas.style.height = this.h + 'px';
+
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        if (this.bgColor) {
+            this.ctx.fillStyle = this.bgColor;
+            this.ctx.fillRect(0, 0, this.w, this.h);
+        } else {
+            this.ctx.clearRect(0, 0, this.w, this.h);
+        }
+
+        this.particles = [];
+        if (prefersReducedMotion) return;
+
+        let amount = Math.max(80, Math.min(Math.floor(this.w * this.h / 10000), 300));
+        // В услугах делаем чуть меньше частиц, чтобы не перегружать текст
+        if (this.type === 'services') amount = Math.floor(amount * 0.7); 
+
+        for (let i = 0; i < amount; i++) {
+            const x = Math.random() * this.w;
+            let y;
+            if (this.type === 'hero') {
+                // На главной - частицы формируют волну по центру
+                const wave1 = this.h / 2 + Math.sin(x * 0.005) * 150;
+                const wave2 = this.h / 2 + Math.cos(x * 0.005) * 150;
+                y = (Math.random() > 0.5 ? wave1 : wave2) + (Math.random() * 100 - 50);
+            } else {
+                // В услугах - частицы разбросаны хаотично по всей секции
+                y = Math.random() * this.h;
+            }
+            this.particles.push(new Particle(x, y, this.ctx, this.type));
+        }
+
+        if (prefersReducedMotion) {
+            this.particles.forEach(p => p.draw());
+        }
+    }
+
+    animate(dt) {
+        if (!this.canvas || this.particles.length === 0) return;
+        const timeScale = dt / 16.66;
+
+        if (this.bgColor) {
+            this.ctx.fillStyle = this.bgColor;
+            this.ctx.fillRect(0, 0, this.w, this.h);
+        } else {
+            this.ctx.clearRect(0, 0, this.w, this.h);
+        }
+
+        // Вычисляем позицию мыши относительно конкретного канваса (учитываем скролл)
+        const rect = this.canvas.getBoundingClientRect();
+        const localMouseX = mouse.x - rect.left;
+        const localMouseY = mouse.y - rect.top;
+
+        for (let i = 0; i < this.particles.length; i++) {
+            this.particles[i].update(timeScale, localMouseX, localMouseY);
+            this.particles[i].draw();
+        }
+    }
 }
 
 class Particle {
-    constructor(x, y) {
+    constructor(x, y, ctx, type) {
+        this.ctx = ctx;
         this.x = x;
         this.y = y;
         this.baseX = x;
         this.baseY = y;
+        this.type = type;
         this.size = Math.random() * 2.5 + 0.5;
         this.density = (Math.random() * 30) + 1;
         this.angle = Math.random() * 360;
@@ -52,17 +113,17 @@ class Particle {
     }
 
     draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        this.ctx.fillStyle = this.color;
+        this.ctx.beginPath();
+        this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        this.ctx.fill();
     }
 
-    update(timeScale) {
+    update(timeScale, mx, my) {
         this.angle += 0.02 * timeScale;
 
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
+        const dx = mx - this.x;
+        const dy = my - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < mouse.radius && distance > 0) {
@@ -71,61 +132,64 @@ class Particle {
             this.y -= (dy / distance) * force * this.density * timeScale;
         } else {
             const targetX = this.baseX;
-            const targetY = this.baseY + Math.sin(this.angle) * 15;
+            // В услугах частицы плавают с бОльшей амплитудой
+            const amplitude = this.type === 'hero' ? 15 : 40; 
+            const targetY = this.baseY + Math.sin(this.angle) * amplitude;
+            
             this.x -= ((this.x - targetX) / 15) * timeScale;
             this.y -= ((this.y - targetY) / 15) * timeScale;
         }
     }
 }
 
-export function initParticles(prefersReducedMotion) {
-    particles = [];
-
-    let amount = Math.max(80, Math.min(Math.floor(width * height / 10000), 300));
-    if (prefersReducedMotion) amount = 0;
-
-    for (let i = 0; i < amount; i++) {
-        const x = Math.random() * width;
-        const wave1 = height / 2 + Math.sin(x * 0.005) * 150;
-        const wave2 = height / 2 + Math.cos(x * 0.005) * 150;
-        const y = (Math.random() > 0.5 ? wave1 : wave2) + (Math.random() * 100 - 50);
-        particles.push(new Particle(x, y));
-    }
-
-    if (prefersReducedMotion) {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, width, height);
-        particles.forEach(p => p.draw());
-    }
-}
-
-export function animateParticles(dt) {
-    if (!dt || particles.length === 0) return;
-    const timeScale = dt / 16.66;
-
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, width, height);
-
-    for (let i = 0; i < particles.length; i++) {
-        particles[i].update(timeScale);
-        particles[i].draw();
-    }
-}
-
 // ============================================================
-//  ARTISTS CANVAS — редкие медленные звёзды за слайдером
+//  STARS SYSTEM (Artists, Stats, Socials)
 // ============================================================
 
-const starsCanvas = document.getElementById('artists-canvas');
-let starsCtx = null;
-let starsW = 0, starsH = 0;
-let stars = [];
-let starsReady = false;
+class StarSystem {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d', { alpha: true });
+        this.stars = [];
+        this.w = 0;
+        this.h = 0;
+    }
 
-// Инициализируем только если canvas существует в DOM
-if (starsCanvas) {
-    starsCtx = starsCanvas.getContext('2d', { alpha: true });
-    starsReady = true;
+    resize(prefersReducedMotion) {
+        const section = this.canvas.parentElement;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.w = section.offsetWidth;
+        this.h = section.offsetHeight;
+
+        this.canvas.width = this.w * dpr;
+        this.canvas.height = this.h * dpr;
+        this.canvas.style.width = this.w + 'px';
+        this.canvas.style.height = this.h + 'px';
+
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        this.stars = [];
+        if (prefersReducedMotion) return;
+
+        // Плотность звёзд
+        const amount = Math.min(50, Math.floor(this.w * this.h / 20000));
+
+        for (let i = 0; i < amount; i++) {
+            this.stars.push(new Star(this.w, this.h));
+        }
+    }
+
+    animate(dt) {
+        if (this.stars.length === 0) return;
+        const timeScale = dt / 16.66;
+
+        this.ctx.clearRect(0, 0, this.w, this.h);
+
+        for (let i = 0; i < this.stars.length; i++) {
+            this.stars[i].update(timeScale);
+            this.stars[i].draw(this.ctx);
+        }
+    }
 }
 
 class Star {
@@ -134,20 +198,13 @@ class Star {
     }
 
     reset(w, h, initial = false) {
-        // Случайная позиция по всей секции
         this.x = Math.random() * w;
-        // При инициализации — случайная Y, при respawn — появляется сверху
         this.y = initial ? Math.random() * h : -5;
-        // Звёзды маленькие — от 0.5 до 1.5px
-        this.size = Math.random() * 1.0 + 0.4;
-        // Очень медленное падение вниз
-        this.speedY = Math.random() * 0.15 + 0.05;
-        // Лёгкое горизонтальное дрейфование
-        this.speedX = (Math.random() - 0.5) * 0.08;
-        // Прозрачность — звёзды ненавязчивые
-        this.alpha = Math.random() * 0.4 + 0.15;
-        // Мерцание
-        this.twinkleSpeed = Math.random() * 0.008 + 0.003;
+        this.size = Math.random() * 1.5 + 0.5; // Чуть крупнее
+        this.speedY = Math.random() * 0.3 + 0.1; // Быстрее падают
+        this.speedX = (Math.random() - 0.5) * 0.15; // Сильнее дрейфуют вбок
+        this.alpha = Math.random() * 0.4 + 0.2;
+        this.twinkleSpeed = Math.random() * 0.01 + 0.005; // Плавнее мерцают
         this.twinkleAngle = Math.random() * Math.PI * 2;
         this.w = w;
         this.h = h;
@@ -158,62 +215,54 @@ class Star {
         this.x += this.speedX * timeScale;
         this.twinkleAngle += this.twinkleSpeed * timeScale;
 
-        // Если ушла за низ или за края — respawn сверху
         if (this.y > this.h + 5 || this.x < -5 || this.x > this.w + 5) {
             this.reset(this.w, this.h, false);
         }
     }
 
     draw(ctx) {
-        // Мерцание — альфа слегка пульсирует
-        const flicker = this.alpha + Math.sin(this.twinkleAngle) * 0.08;
+        const flicker = this.alpha + Math.sin(this.twinkleAngle) * 0.15;
         const a = Math.max(0, Math.min(1, flicker));
 
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        // Чисто белые звёзды с очень лёгким холодным оттенком
         ctx.fillStyle = `rgba(220, 215, 255, ${a})`;
         ctx.fill();
     }
 }
 
+// ============================================================
+//  EXPORTS FOR main.js
+// ============================================================
+
+let heroSystem = null;
+let servicesSystem = null;
+let starSystems = [];
+
+export function resizeCanvas(prefersReducedMotion) {
+    if (!heroSystem) heroSystem = new ParticleSystem('hero-canvas', 'hero');
+    heroSystem.resize(prefersReducedMotion);
+
+    if (!servicesSystem) servicesSystem = new ParticleSystem('services-canvas', 'services');
+    servicesSystem.resize(prefersReducedMotion);
+}
+
+export function animateParticles(dt) {
+    if (heroSystem) heroSystem.animate(dt);
+    if (servicesSystem) servicesSystem.animate(dt);
+}
+
 export function initStars(prefersReducedMotion) {
-    if (!starsReady || !starsCtx) return;
-
-    const section = document.getElementById('artists');
-    if (!section) return;
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    starsW = section.offsetWidth;
-    starsH = section.offsetHeight;
-
-    starsCanvas.width = starsW * dpr;
-    starsCanvas.height = starsH * dpr;
-    starsCanvas.style.width = starsW + 'px';
-    starsCanvas.style.height = starsH + 'px';
-
-    starsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    stars = [];
-    if (prefersReducedMotion) return;
-
-    // Немного звёзд — не много, не редко. ~35 для больших экранов, меньше для мобилок.
-    const amount = Math.min(35, Math.floor(starsW * starsH / 25000));
-
-    for (let i = 0; i < amount; i++) {
-        stars.push(new Star(starsW, starsH));
+    // Собираем все канвасы со звёздами по классу
+    if (starSystems.length === 0) {
+        const canvases = document.querySelectorAll('.stars-canvas-bg');
+        canvases.forEach(canvas => {
+            starSystems.push(new StarSystem(canvas));
+        });
     }
+    starSystems.forEach(sys => sys.resize(prefersReducedMotion));
 }
 
 export function animateStars(dt) {
-    if (!starsReady || !starsCtx || stars.length === 0) return;
-    const timeScale = dt / 16.66;
-
-    // Прозрачный фон — звёзды поверх CSS-фона секции
-    starsCtx.clearRect(0, 0, starsW, starsH);
-
-    for (let i = 0; i < stars.length; i++) {
-        stars[i].update(timeScale);
-        stars[i].draw(starsCtx);
-    }
+    starSystems.forEach(sys => sys.animate(dt));
 }
