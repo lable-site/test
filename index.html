@@ -799,13 +799,17 @@
             swiperInstance.destroy(true, true);
         }
 
+        const isLoop = count > 1;
+
         swiperInstance = new Swiper(".artistSwiper", {
             effect: "coverflow",
             grabCursor: true,
             centeredSlides: true,
-            loop: false,        // STRICT REQUIREMENT: No clones, stable order
-            rewind: true,       // STRICT REQUIREMENT: Smooth return to first after last
-            initialSlide: 0,    // STRICT REQUIREMENT: Start precisely at index 0
+            initialSlide: 0,
+            loop: isLoop,
+            loopedSlides: count,
+            loopAdditionalSlides: count,
+            watchOverflow: true,
             slideToClickedSlide: true,
             speed: 800,
             watchSlidesProgress: true,
