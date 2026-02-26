@@ -244,15 +244,12 @@ html, body {
 }
 
 /* ============================================================
-   СЕКЦИЯ АРТИСТОВ — фоновый canvas со звёздами
+   СЕКЦИЯ АРТИСТОВ
    ============================================================ */
 .artists-section {
-    /* overflow:hidden нельзя — обрежет box-shadow карточек.
-       Фоновый canvas абсолютный внутри секции. */
     overflow: visible;
 }
 
-/* Звёздный холст — абсолютный фон за слайдером */
 #artists-canvas {
     position: absolute;
     top: 0;
@@ -261,31 +258,28 @@ html, body {
     height: 100%;
     z-index: 0;
     pointer-events: none;
-    /* Прозрачный фон — звёзды поверх тёмного секции */
     background: transparent;
 }
 
 /* ============================================================
-   СЛАЙДЕР АРТИСТОВ
+   СЛАЙДЕР АРТИСТОВ (Исправлено выравнивание!)
    ============================================================ */
-
-/* Внешний wrapper: полная ширина, overflow visible для box-shadow */
 .artistSwiper {
     width: 100%;
     position: relative;
-    z-index: 1; /* выше canvas со звёздами */
+    z-index: 1; 
 
-    /* Вертикальный padding — для box-shadow активной карточки */
+    /* ВАЖНО: Задаем ту же максимальную ширину, что и у сетки услуг! */
+    max-width: 1600px;
+    margin: 0 auto;
+
     padding-top: 20px !important;
     padding-bottom: 70px !important;
-
-    /* Горизонтальный padding выравнивает левый край первой карточки
-       по той же линии что заголовки и сетка услуг (--layout-x) */
     padding-left: var(--layout-x) !important;
     padding-right: var(--layout-x) !important;
 }
 
-/* Sniper по умолчанию clip overflow — убираем для box-shadow */
+/* Это позволяет карточкам плавно уходить за правый край экрана без обрезки */
 .artistSwiper.swiper {
     overflow: visible !important;
 }
@@ -319,13 +313,12 @@ html, body {
     transform: scale(0.85);
 }
 
-/* Тонкое симметричное свечение — премиум, не кричащее */
 .swiper-slide-active .artist-card {
     border-color: rgba(138, 43, 226, 0.5);
     box-shadow:
-        0 0 0 1px rgba(138, 43, 226, 0.2),   /* тонкий контур */
-        0 0 25px 4px rgba(138, 43, 226, 0.3), /* основное мягкое свечение */
-        0 0 60px 10px rgba(138, 43, 226, 0.1); /* дальний ореол */
+        0 0 0 1px rgba(138, 43, 226, 0.2),   
+        0 0 25px 4px rgba(138, 43, 226, 0.3), 
+        0 0 60px 10px rgba(138, 43, 226, 0.1); 
     transform: scale(1.05);
 }
 
@@ -371,7 +364,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
-    padding: 0 var(--layout-x); /* та же линия что заголовки и слайдер */
+    padding: 0 var(--layout-x); 
     max-width: 1600px;
     margin: 0 auto;
 }
@@ -521,7 +514,7 @@ html, body {
 }
 
 /* ============================================================
-   СОЦСЕТИ — все три кнопки одинаковые (glassmorphism)
+   СОЦСЕТИ
    ============================================================ */
 .socials-section {
     text-align: center;
@@ -615,8 +608,6 @@ footer {
     }
     .section-title { gap: 15px; }
 
-    /* Мобильный слайдер: без горизонтального padding,
-       карточки занимают почти всю ширину экрана */
     .artistSwiper {
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -659,7 +650,6 @@ footer {
 @media (min-width: 768px) and (max-width: 1023px) {
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
 
-    /* Планшет: небольшой padding чтобы карточки не упирались в край */
     .artistSwiper {
         padding-left: calc(var(--layout-x) / 2) !important;
         padding-right: calc(var(--layout-x) / 2) !important;
@@ -679,7 +669,7 @@ footer {
 }
 
 /* ============================================================
-   FALLBACK — старые браузеры без backdrop-filter
+   FALLBACK
    ============================================================ */
 @supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
     .header, .service-card, .stat-card, .social-btn {
@@ -688,7 +678,7 @@ footer {
 }
 
 /* ============================================================
-   ДОСТУПНОСТЬ — отключённые анимации
+   ДОСТУПНОСТЬ
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
     .hero-title, .hero-intro {
