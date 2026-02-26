@@ -59,14 +59,13 @@ function initSwiper(count) {
 
     swiperInstance = new Swiper('.artistSwiper', {
         effect: 'coverflow',
-        grabCursor: count > 1,
+        grabCursor: true,
         centeredSlides: true,
         initialSlide: 0,
         loop: false,
         rewind: count > 1,
-        allowTouchMove: count > 1,
-        simulateTouch: count > 1,
-        slideToClickedSlide: count > 1,
+        allowTouchMove: true,
+        simulateTouch: true,
         speed: 800,
         watchSlidesProgress: true,
         touchRatio: 1.5,
@@ -86,19 +85,24 @@ function initSwiper(count) {
             onlyInViewport: true,
         },
 
-        // --- ИСПРАВЛЕНЫ ЗАПЯТЫЕ ---
+        // --- МАГИЯ ВОЗВРАЩЕНИЯ СТАТИКИ К ЖИЗНИ ---
         breakpoints: {
             0: {
                 slidesPerView: count === 1 ? 1 : 1.2,
-                coverflowEffect: { stretch: 30, depth: 200 }
+                coverflowEffect: { stretch: 30, depth: 200 },
+                centeredSlides: true
             },
             768: {
                 slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 2,
-                coverflowEffect: { stretch: 20, depth: 80 }
+                coverflowEffect: { stretch: 20, depth: 80 },
+                centeredSlides: true
             },
             1024: {
-                slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 3,
-                coverflowEffect: { stretch: 0, depth: 0 }, // <--- ВОТ ЭТА ЗАПЯТАЯ ВЕРНУЛАСЬ!
+                // Если артистов много, показываем 2.6 карточки. 
+                // Кусочек следующей карточки выглядывает, заставляя слайдер СКРОЛЛИТЬСЯ.
+                slidesPerView: count === 1 ? 1 : count === 2 ? 2 : 2.6,
+                spaceBetween: 30, // Выравниваем зазоры между фото как в спектре услуг
+                coverflowEffect: { stretch: 0, depth: 0 },
                 centeredSlides: false
             }
         }
