@@ -8,6 +8,9 @@
     <meta property="og:title" content="NATIVE | Музыкальный лейбл">
     <meta property="og:description" content="Мы предлагаем широкий спектр услуг для артистов: от записи и сведения до съемки клипов и продвижения.">
     <meta property="og:image" content="./logo.png">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#05020a">
+    <link rel="canonical" href="https://nativelabel.ru/">
 
     <title>NATIVE | Музыкальный лейбл</title>
     
@@ -51,14 +54,22 @@
         ::-webkit-scrollbar-thumb { background: #2a1b42; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--native-purple); }
 
+        /* Accessibility: Focus styles */
+        :focus-visible {
+            outline: 2px solid var(--native-purple);
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+        .nav-arrow:focus-visible { background: var(--native-purple); }
+
         .page-wrapper {
             position: relative;
             width: 100%;
             overflow: hidden;
         }
 
-        /* GPU Acceleration for heavy animating elements */
-        .swiper-slide, .artist-card, .reveal, .service-card::before {
+        /* GPU Acceleration limited to strictly necessary elements */
+        .swiper-slide, .reveal {
             will-change: transform, opacity;
         }
 
@@ -463,6 +474,12 @@
             .section { padding: 80px 0; }
             .hero-title { font-size: clamp(40px, 12vw, 60px); }
             .section-header { padding: 0 5% 30px; }
+            
+            /* Mobile Buttons UX Fix */
+            .social-btn {
+                padding: 12px 24px;
+                font-size: 13px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -521,7 +538,7 @@
 <div class="page-wrapper">
 
     <header class="header">
-        <a href="#" class="header-logo">
+        <a href="#" class="header-logo" aria-label="NATIVE Главная">
             <img src="./logo.png" alt="NATIVE Logo" class="logo-img">
             <span class="logo-text">NATIVE</span>
         </a>
@@ -530,7 +547,7 @@
             <a href="#services">Услуги</a>
             <a href="#artists">Артисты</a>
         </nav>
-        <a href="https://t.me/music_for_native_bot" target="_blank" rel="noopener noreferrer" class="btn-primary">ОТПРАВИТЬ ДЕМО</a>
+        <a href="https://t.me/music_for_native_bot" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо">ОТПРАВИТЬ ДЕМО</a>
     </header>
 
     <section class="hero" id="about">
@@ -550,8 +567,8 @@
         <div class="section-header reveal">
             <h2 class="section-title">Наши артисты</h2>
             <div class="slider-nav">
-                <div class="nav-arrow main-prev"><i class="fa-solid fa-chevron-left"></i></div>
-                <div class="nav-arrow main-next"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="nav-arrow main-prev" role="button" tabindex="0" aria-label="Предыдущий артист"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></div>
+                <div class="nav-arrow main-next" role="button" tabindex="0" aria-label="Следующий артист"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
         </div>
         
@@ -662,14 +679,14 @@
     <section class="section socials-section reveal">
         <h2 class="section-title">Join The Native</h2>
         <div class="social-links">
-            <a href="https://vk.ru/nativelabel" target="_blank" rel="noopener noreferrer" class="social-btn">
-                <i class="fa-brands fa-vk"></i> ВКонтакте
+            <a href="https://vk.ru/nativelabel" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
+                <i class="fa-brands fa-vk" aria-hidden="true"></i> ВКонтакте
             </a>
-            <a href="https://t.me/native_label" target="_blank" rel="noopener noreferrer" class="social-btn" style="background: linear-gradient(135deg, var(--native-purple), #5a189a); border:none;">
-                <i class="fa-brands fa-telegram"></i> Telegram
+            <a href="https://t.me/native_label" target="_blank" rel="noopener noreferrer" class="social-btn" style="background: linear-gradient(135deg, var(--native-purple), #5a189a); border:none;" aria-label="Telegram">
+                <i class="fa-brands fa-telegram" aria-hidden="true"></i> Telegram
             </a>
-            <a href="https://youtube.com/@nativelabel?si=EtcL2Ii0iGuvhe7S" target="_blank" rel="noopener noreferrer" class="social-btn">
-                <i class="fa-brands fa-youtube"></i> YouTube
+            <a href="https://youtube.com/@nativelabel?si=EtcL2Ii0iGuvhe7S" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="YouTube">
+                <i class="fa-brands fa-youtube" aria-hidden="true"></i> YouTube
             </a>
         </div>
     </section>
@@ -714,12 +731,16 @@
         globalRafId = requestAnimationFrame(renderLoop);
     }
 
-    // 2. Intersection Observer
+    // 2. Intersection Observer with Performance GC
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
+                // Clean up will-change to free GPU memory after transition (800ms)
+                setTimeout(() => {
+                    entry.target.style.willChange = 'auto';
+                }, 1000);
                 observer.unobserve(entry.target);
             }
         });
@@ -739,14 +760,17 @@
         loop: true,
         speed: 800,
         slidesPerView: "auto",
-        loopedSlides: 4, // Ensures clone generation matches slidesPerView: auto without layout thrashing
         watchSlidesProgress: true, // Prevents layout repaints
         touchRatio: 1.5,
         resistanceRatio: 0.85,
-        threshold: 10, // Prevents accidental dragging/clicks during scroll
+        threshold: 5, // Prevents accidental dragging/clicks during scroll
+        keyboard: {
+            enabled: true,
+            onlyInViewport: true,
+        },
         mousewheel: {
-            forceToAxis: true, // Crucial: Allows Lenis vertical scroll, takes horizontal trackpad slide
-            releaseOnEdges: true, // Failsafe to allow native scroll continuation
+            forceToAxis: true, // Crucial: Allows Lenis vertical scroll
+            releaseOnEdges: true, 
             sensitivity: 0.5,
         },
         coverflowEffect: {
@@ -764,6 +788,9 @@
             // Mobile handles default settings, Desktop gets enhanced stability
             768: {
                 coverflowEffect: { stretch: 45 }
+            },
+            1024: {
+                coverflowEffect: { stretch: 50 }
             }
         }
     });
@@ -771,17 +798,17 @@
     // 4. Time-Based High-Performance Canvas
     const canvas = document.getElementById('hero-canvas');
     const heroSection = document.getElementById('about');
-    const ctx = canvas.getContext('2d', { alpha: false }); // Minor GPU optimization
+    const ctx = canvas.getContext('2d', { alpha: false }); 
     let width, height, particles;
+    
+    // Cache background color so it doesn't force reflows during initialization
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--native-dark').trim() || '#05020a';
 
     function resizeCanvas() {
-        // Cap DPR to 2 to prevent extreme CPU load on 4K/Retina displays
         const dpr = Math.min(window.devicePixelRatio || 1, 2); 
-        // Bind size strictly to hero section to prevent mobile URL bar scroll jumps
-        const rect = heroSection.getBoundingClientRect(); 
-        
-        width = rect.width;
-        height = rect.height;
+        // Using offsetWidth/offsetHeight strictly to prevent reflow
+        width = heroSection.offsetWidth;
+        height = heroSection.offsetHeight;
         
         canvas.width = width * dpr;
         canvas.height = height * dpr;
@@ -790,8 +817,7 @@
         
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         
-        // Draw baseline dark bg because alpha:false
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--native-dark').trim();
+        ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, width, height);
     }
     resizeCanvas();
@@ -818,7 +844,7 @@
             ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill(); // Dropped closePath() for micro-optimization on primitive shapes
+            ctx.fill(); 
         }
 
         update(timeScale) {
@@ -853,7 +879,6 @@
 
     function initParticles() {
         particles = [];
-        // Calculate amount dynamically based on area, clamping between 80 and 300
         let area = width * height;
         let amount = Math.max(80, Math.min(Math.floor(area / 10000), 300));
         if (prefersReducedMotion) amount = 0;
@@ -868,7 +893,7 @@
         }
 
         if (prefersReducedMotion) {
-            ctx.fillStyle = '#05020a';
+            ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, width, height);
             for (let i = 0; i < particles.length; i++) particles[i].draw();
         }
@@ -876,10 +901,9 @@
 
     function animateParticles(dt) {
         if (!dt) return;
-        let timeScale = dt / 16.66; // Normalizes movement independent of refresh rate (60hz vs 144hz)
+        let timeScale = dt / 16.66; 
 
-        // Clear with background color instead of clearRect due to alpha:false
-        ctx.fillStyle = '#05020a'; 
+        ctx.fillStyle = bgColor; 
         ctx.fillRect(0, 0, width, height);
 
         for (let i = 0; i < particles.length; i++) {
@@ -901,7 +925,7 @@
             cancelAnimationFrame(globalRafId);
         } else {
             if (!prefersReducedMotion) {
-                lastTime = performance.now(); // Reset delta base
+                lastTime = performance.now(); 
                 globalRafId = requestAnimationFrame(renderLoop);
             }
         }
