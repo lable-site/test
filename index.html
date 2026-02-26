@@ -799,22 +799,15 @@
             swiperInstance.destroy(true, false);
         }
 
-        const isLoop = count >= 3;
-        const isCentered = count !== 2;
-        const loopCount = isLoop ? Math.min(count, 5) : 0;
-
         swiperInstance = new Swiper(".artistSwiper", {
             effect: "coverflow",
             grabCursor: true,
-            centeredSlides: isCentered,
+            centeredSlides: true,
             initialSlide: 0,
-            loop: isLoop,
-            loopedSlides: loopCount,
-            loopPreventsSliding: false, 
-            normalizeSlideIndex: true,
-            observer: true,
-            observeParents: true,
-            watchOverflow: true,
+            loop: false,
+            rewind: true,
+            allowTouchMove: count > 1,
+            simulateTouch: count > 1,
             slideToClickedSlide: true,
             speed: 800,
             watchSlidesProgress: true,
@@ -824,11 +817,6 @@
             keyboard: {
                 enabled: true,
                 onlyInViewport: true,
-            },
-            mousewheel: {
-                forceToAxis: true,
-                releaseOnEdges: true, 
-                sensitivity: 0.5,
             },
             coverflowEffect: {
                 rotate: 0,
@@ -853,15 +841,6 @@
                 1024: {
                     slidesPerView: count === 2 ? 1.2 : 3,
                     coverflowEffect: { stretch: 50 }
-                }
-            },
-            on: {
-                init(swiper) {
-                    if (isLoop) {
-                        swiper.slideToLoop(0, 0, false);
-                    } else {
-                        swiper.slideTo(0, 0, false);
-                    }
                 }
             }
         });
