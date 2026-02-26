@@ -751,7 +751,7 @@
     let lastTime = performance.now();
     let swiperInstance = null; 
 
-    // === 4. Architecture Ready for Supabase ===
+    // === Architecture Ready for Supabase ===
     const mockArtists = [
         { name: "Pussykiller", img: "https://sun9-24.vkuserphoto.ru/s/v1/ig2/6C_Y4iNdHRUEOTyoZznezRjHJCy-Ejq8BpF5LgTrkfQveP4hmIXy_392B-6rIibYfrDO5_oYK_AVJg5qlCzsN2N0.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0" },
         { name: "Я про рок", img: "https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" },
@@ -765,7 +765,7 @@
         }
     };
 
-    // 3. Создание DOM элемента с защитой от XSS
+    // Создание DOM элемента с защитой от XSS
     function createArtistSlide(artist) {
         const slide = document.createElement('div');
         slide.className = 'swiper-slide';
@@ -796,10 +796,12 @@
     // Инициализация Swiper с учетом количества
     function initSwiper(count) {
         if (swiperInstance) {
-            swiperInstance.destroy(true, true);
+            swiperInstance.destroy(true, false);
         }
 
-        const isLoop = count > 1;
+        const isLoop = count >= 3;
+        // Optimization: dynamically calculate loopedSlides to prevent layout thrashing
+        const loopCount = isLoop ? Math.min(count, 5) : 0; 
 
         swiperInstance = new Swiper(".artistSwiper", {
             effect: "coverflow",
@@ -807,8 +809,12 @@
             centeredSlides: true,
             initialSlide: 0,
             loop: isLoop,
-            loopedSlides: count,
-            loopAdditionalSlides: count,
+            loopedSlides: loopCount,
+            loopAdditionalSlides: loopCount,
+            loopPreventsSliding: false, 
+            normalizeSlideIndex: true,
+            observer: true,
+            observeParents: true,
             watchOverflow: true,
             slideToClickedSlide: true,
             speed: 800,
@@ -838,19 +844,28 @@
             },
             breakpoints: {
                 0: {
-                    slidesPerView: count === 1 ? 1 : 1.2,
-                    coverflowEffect: { stretch: 30 }
+                    slidesPerView: 1.2,
+                    coverflowEffect: { stretch: 30 },
+                    centeredSlides: true 
                 },
                 768: {
-                    slidesPerView: count < 2 ? count : 2,
+                    slidesPerView: count === 2 ? 1.2 : 2, 
+                    centeredSlides: count !== 2, 
                     coverflowEffect: { stretch: 45 }
                 },
                 1024: {
-                    slidesPerView: count < 3 ? count : 3,
+                    slidesPerView: count === 2 ? 1.2 : 3,
+                    centeredSlides: count !== 2,
                     coverflowEffect: { stretch: 50 }
                 }
             }
         });
+        
+        // Post-init update to ensure accurate rendering and centering
+        if(swiperInstance) {
+            swiperInstance.update();
+            if(isLoop) swiperInstance.slideToLoop(0, 0);
+        }
     }
 
     // Главная функция рендера артистов
@@ -929,7 +944,7 @@
                     animateValue(statNum, 0, parseInt(statNum.dataset.target, 10), 2000);
                 }
 
-                // 5. Очистка will-change после анимации
+                // Очистка will-change после анимации
                 setTimeout(() => {
                     entry.target.style.willChange = 'auto';
                 }, 1000);
@@ -1086,6 +1101,10 @@
         resizeTimeout = setTimeout(() => {
             resizeCanvas();
             initParticles();
+            // Force swiper update on resize to maintain correct centering
+            if(swiperInstance) {
+               swiperInstance.update();
+            }
         }, 250);
     });
 </script>
