@@ -224,6 +224,57 @@
             z-index: 10;
         }
 
+        /* Premium Stats Section Styling */
+        .stats-section {
+            padding: 40px 0 80px;
+            z-index: 10;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            padding: 0 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px 20px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(138, 43, 226, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--native-purple-glow);
+        }
+
+        .stat-number {
+            font-family: 'Raleway', sans-serif;
+            font-size: clamp(40px, 5vw, 64px);
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 15px;
+            background: linear-gradient(180deg, #ffffff 0%, var(--native-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -262,7 +313,6 @@
         }
 
         .swiper-slide {
-            width: 350px; 
             height: 500px;
             transition: var(--transition);
             filter: grayscale(100%) brightness(0.4);
@@ -474,12 +524,6 @@
             .section { padding: 80px 0; }
             .hero-title { font-size: clamp(40px, 12vw, 60px); }
             .section-header { padding: 0 5% 30px; }
-            
-            /* Mobile Buttons UX Fix */
-            .social-btn {
-                padding: 12px 24px;
-                font-size: 13px;
-            }
         }
 
         @media (max-width: 768px) {
@@ -493,13 +537,26 @@
             }
             .slider-nav { align-self: flex-end; }
             
-            .swiper-slide { 
-                width: 280px; 
-                height: 400px; 
-            }
+            /* Stats Section Mobile */
+            .stats-grid { grid-template-columns: 1fr; gap: 20px; }
+            .stats-section { padding: 40px 0; }
+            .stat-card { padding: 30px 20px; }
+
+            /* Swiper Slide Fixes */
+            .swiper-slide { height: 400px; }
             .artist-info h3 { font-size: 24px; }
             
-            .social-links { flex-direction: column; }
+            /* Mobile Buttons UX Fix */
+            .social-links { flex-direction: column; align-items: center; gap: 15px; }
+            .social-btn {
+                width: 100%;
+                max-width: 320px;
+                margin: 0 auto;
+                padding: 12px 20px;
+                justify-content: center;
+            }
+            .social-btn:hover { transform: translateY(-2px); }
+
             footer { flex-direction: column; gap: 15px; text-align: center; }
         }
 
@@ -514,7 +571,7 @@
         }
 
         @supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
-            .header, .service-card, .nav-arrow {
+            .header, .service-card, .nav-arrow, .stat-card {
                 background: rgba(15, 10, 25, 0.85);
             }
         }
@@ -563,6 +620,23 @@
         </div>
     </section>
 
+    <section class="section stats-section" id="stats">
+        <div class="stats-grid">
+            <div class="stat-card reveal">
+                <div class="stat-number" data-target="12" data-suffix="+">0</div>
+                <div class="stat-label">артистов</div>
+            </div>
+            <div class="stat-card reveal">
+                <div class="stat-number" data-target="120" data-suffix="M+">0</div>
+                <div class="stat-label">прослушиваний</div>
+            </div>
+            <div class="stat-card reveal">
+                <div class="stat-number" data-target="300" data-suffix="+">0</div>
+                <div class="stat-label">релизов</div>
+            </div>
+        </div>
+    </section>
+
     <section class="section" id="artists">
         <div class="section-header reveal">
             <h2 class="section-title">Наши артисты</h2>
@@ -573,36 +647,8 @@
         </div>
         
         <div class="swiper artistSwiper reveal">
-            <div class="swiper-wrapper">
-                
-                <div class="swiper-slide">
-                    <div class="artist-card">
-                        <img src="https://sun9-24.vkuserphoto.ru/s/v1/ig2/6C_Y4iNdHRUEOTyoZznezRjHJCy-Ejq8BpF5LgTrkfQveP4hmIXy_392B-6rIibYfrDO5_oYK_AVJg5qlCzsN2N0.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0" loading="lazy" decoding="async" alt="Pussykiller">
-                        <div class="artist-info">
-                            <h3>Pussykiller</h3>
-                        </div>
-                    </div>
+            <div class="swiper-wrapper" id="artists-wrapper">
                 </div>
-
-                <div class="swiper-slide">
-                    <div class="artist-card">
-                        <img src="https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" loading="lazy" decoding="async" alt="Я Про Рок">
-                        <div class="artist-info">
-                            <h3>Я про рок</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="swiper-slide">
-                    <div class="artist-card">
-                        <img src="https://sun9-53.vkuserphoto.ru/s/v1/ig2/_eZ8hJvlB5h-0ckNZ99RklPmMgfL7-cDR_8qcH3gqvjxdw2JQeFWHm8Q86cOBjZXMKoHxCuxVpO3n1iFbKQQys7s.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2560x2560&from=bu&cs=2560x0" loading="lazy" decoding="async" alt="White Gallows">
-                        <div class="artist-info">
-                            <h3>White Gallows</h3>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
         </div>
     </section>
 
@@ -707,7 +753,31 @@
     let globalRafId;
     let lastTime = performance.now();
 
-    // 1. Unified Event Loop Architecture (Lenis + Canvas)
+    // === Architecture Ready for Supabase ===
+    const mockArtists = [
+        { name: "Pussykiller", img: "https://sun9-24.vkuserphoto.ru/s/v1/ig2/6C_Y4iNdHRUEOTyoZznezRjHJCy-Ejq8BpF5LgTrkfQveP4hmIXy_392B-6rIibYfrDO5_oYK_AVJg5qlCzsN2N0.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0" },
+        { name: "Я про рок", img: "https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" },
+        { name: "White Gallows", img: "https://sun9-53.vkuserphoto.ru/s/v1/ig2/_eZ8hJvlB5h-0ckNZ99RklPmMgfL7-cDR_8qcH3gqvjxdw2JQeFWHm8Q86cOBjZXMKoHxCuxVpO3n1iFbKQQys7s.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2560x2560&from=bu&cs=2560x0" }
+    ];
+
+    function loadArtists() {
+        const wrapper = document.getElementById('artists-wrapper');
+        wrapper.innerHTML = mockArtists.map(artist => `
+            <div class="swiper-slide">
+                <div class="artist-card">
+                    <img src="${artist.img}" loading="lazy" decoding="async" alt="${artist.name}">
+                    <div class="artist-info">
+                        <h3>${artist.name}</h3>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Инициализация контента перед запуском Swiper
+    loadArtists();
+
+    // === Unified Event Loop Architecture ===
     if (!prefersReducedMotion) {
         lenis = new Lenis({
             duration: 1.2,
@@ -721,7 +791,6 @@
         let dt = time - lastTime;
         lastTime = time;
         
-        // Prevent huge delta jumps if tab was inactive
         if (dt > 100) dt = 16.6; 
         
         if (!prefersReducedMotion) {
@@ -731,13 +800,42 @@
         globalRafId = requestAnimationFrame(renderLoop);
     }
 
-    // 2. Intersection Observer with Performance GC
+    // === Counter Animation Logic ===
+    function animateValue(obj, start, end, duration) {
+        if (prefersReducedMotion) {
+            obj.innerHTML = end + (obj.dataset.suffix || "");
+            return;
+        }
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const easeProgress = progress * (2 - progress); // easeOutQuad
+            const current = Math.floor(easeProgress * (end - start) + start);
+            
+            obj.innerHTML = current + (obj.dataset.suffix || "");
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // === Intersection Observer ===
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                // Clean up will-change to free GPU memory after transition (800ms)
+
+                // Trigger Count-up Animation
+                const statNum = entry.target.querySelector('.stat-number');
+                if(statNum && !statNum.dataset.animated) {
+                    statNum.dataset.animated = "true";
+                    animateValue(statNum, 0, parseInt(statNum.dataset.target, 10), 2000);
+                }
+
                 setTimeout(() => {
                     entry.target.style.willChange = 'auto';
                 }, 1000);
@@ -749,33 +847,37 @@
     if (!prefersReducedMotion) {
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     } else {
-        document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+        document.querySelectorAll('.reveal').forEach(el => {
+            el.classList.add('active');
+            const statNum = el.querySelector('.stat-number');
+            if(statNum) statNum.innerHTML = statNum.dataset.target + (statNum.dataset.suffix || "");
+        });
     }
 
-    // 3. Swiper Configuration Refactored for Production Desktop UX
+    // === Swiper Setup ===
     new Swiper(".artistSwiper", {
         effect: "coverflow",
         grabCursor: true,
         centeredSlides: true,
         loop: true,
+        loopAdditionalSlides: 3,
+        slideToClickedSlide: true,
         speed: 800,
-        slidesPerView: "auto",
-        watchSlidesProgress: true, // Prevents layout repaints
+        watchSlidesProgress: true,
         touchRatio: 1.5,
         resistanceRatio: 0.85,
-        threshold: 5, // Prevents accidental dragging/clicks during scroll
+        threshold: 5,
         keyboard: {
             enabled: true,
             onlyInViewport: true,
         },
         mousewheel: {
-            forceToAxis: true, // Crucial: Allows Lenis vertical scroll
+            forceToAxis: true,
             releaseOnEdges: true, 
             sensitivity: 0.5,
         },
         coverflowEffect: {
             rotate: 0,
-            stretch: 50,
             depth: 200,
             modifier: 1,
             slideShadows: false,
@@ -785,28 +887,31 @@
             prevEl: ".main-prev",
         },
         breakpoints: {
-            // Mobile handles default settings, Desktop gets enhanced stability
+            0: {
+                slidesPerView: 1.2,
+                coverflowEffect: { stretch: 30 }
+            },
             768: {
+                slidesPerView: 2,
                 coverflowEffect: { stretch: 45 }
             },
             1024: {
+                slidesPerView: 3,
                 coverflowEffect: { stretch: 50 }
             }
         }
     });
 
-    // 4. Time-Based High-Performance Canvas
+    // === Canvas Initialization ===
     const canvas = document.getElementById('hero-canvas');
     const heroSection = document.getElementById('about');
     const ctx = canvas.getContext('2d', { alpha: false }); 
     let width, height, particles;
     
-    // Cache background color so it doesn't force reflows during initialization
     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--native-dark').trim() || '#05020a';
 
     function resizeCanvas() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2); 
-        // Using offsetWidth/offsetHeight strictly to prevent reflow
         width = heroSection.offsetWidth;
         height = heroSection.offsetHeight;
         
@@ -816,7 +921,6 @@
         canvas.style.height = height + 'px';
         
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, width, height);
     }
@@ -912,14 +1016,13 @@
         }
     }
 
-    // 5. Initialize and Lifecycle Management
+    // Initialize and Start Animation Loop
     initParticles();
     
     if (!prefersReducedMotion) {
         globalRafId = requestAnimationFrame(renderLoop);
     }
 
-    // Handle tab switching safety
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             cancelAnimationFrame(globalRafId);
@@ -931,7 +1034,6 @@
         }
     });
 
-    // Handle smooth debounced resizing
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
