@@ -51,11 +51,6 @@
         ::-webkit-scrollbar-thumb { background: #2a1b42; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--native-purple); }
 
-        /* 8. GPU-оптимизация для анимируемых и hover-элементов */
-        .hero-title, .hero-intro, .artist-card, .artist-info h3, .service-card, .btn-primary, .social-btn, .nav-arrow, .header-logo {
-            will-change: transform, opacity;
-        }
-
         .page-wrapper {
             position: relative;
             width: 100%;
@@ -140,7 +135,6 @@
 
         .hero {
             position: relative;
-            /* 2. Исправление layout-бага с 100vw */
             width: 100%;
             min-height: 100vh;
             display: flex;
@@ -479,6 +473,25 @@
             .social-links { flex-direction: column; }
             footer { flex-direction: column; gap: 15px; text-align: center; }
         }
+
+        @supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+            .header, .service-card, .nav-arrow {
+                background: rgba(15, 10, 25, 0.85);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-title, .hero-intro {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -495,7 +508,7 @@
             <a href="#services">Услуги</a>
             <a href="#artists">Артисты</a>
         </nav>
-        <a href="https://t.me/music_for_native_bot" target="_blank" class="btn-primary">ОТПРАВИТЬ ДЕМО</a>
+        <a href="https://t.me/music_for_native_bot" target="_blank" rel="noopener noreferrer" class="btn-primary">ОТПРАВИТЬ ДЕМО</a>
     </header>
 
     <section class="hero" id="about">
@@ -627,13 +640,13 @@
     <section class="section socials-section reveal">
         <h2 class="section-title">Join The Native</h2>
         <div class="social-links">
-            <a href="https://vk.ru/nativelabel" target="_blank" class="social-btn">
+            <a href="https://vk.ru/nativelabel" target="_blank" rel="noopener noreferrer" class="social-btn">
                 <i class="fa-brands fa-vk"></i> ВКонтакте
             </a>
-            <a href="https://t.me/native_label" target="_blank" class="social-btn" style="background: linear-gradient(135deg, var(--native-purple), #5a189a); border:none;">
+            <a href="https://t.me/native_label" target="_blank" rel="noopener noreferrer" class="social-btn" style="background: linear-gradient(135deg, var(--native-purple), #5a189a); border:none;">
                 <i class="fa-brands fa-telegram"></i> Telegram
             </a>
-            <a href="https://youtube.com/@nativelabel?si=EtcL2Ii0iGuvhe7S" target="_blank" class="social-btn">
+            <a href="https://youtube.com/@nativelabel?si=EtcL2Ii0iGuvhe7S" target="_blank" rel="noopener noreferrer" class="social-btn">
                 <i class="fa-brands fa-youtube"></i> YouTube
             </a>
         </div>
@@ -650,18 +663,23 @@
 <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 
 <script>
-    const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2, 
-    });
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let lenisRafId;
 
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
+    if (!prefersReducedMotion) {
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            touchMultiplier: 2, 
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            lenisRafId = requestAnimationFrame(raf);
+        }
+        lenisRafId = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
 
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries, observer) => {
@@ -673,9 +691,12 @@
         });
     }, observerOptions);
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    if (!prefersReducedMotion) {
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    } else {
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+    }
 
-    // 5. Убран mousewheel у Swiper для устранения конфликта со скроллом Lenis
     new Swiper(".artistSwiper", {
         effect: "coverflow",
         grabCursor: true,
@@ -699,12 +720,18 @@
     const canvas = document.getElementById('hero-canvas');
     const ctx = canvas.getContext('2d');
     let width, height, particles;
+    let canvasAnimationId;
 
     function resizeCanvas() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     const mouse = { x: width / 2, y: height / 2, radius: 150 };
@@ -735,13 +762,11 @@
 
         update() {
             this.angle += 0.02;
-            this.baseY += Math.sin(this.angle) * 0.5;
 
             let dx = mouse.x - this.x;
             let dy = mouse.y - this.y;
             let distance = Math.sqrt(dx * dx + dy * dy);
             
-            // 4. Добавлена проверка на distance > 0 для избежания NaN
             if (distance < mouse.radius && distance > 0) {
                 let forceDirectionX = dx / distance;
                 let forceDirectionY = dy / distance;
@@ -752,13 +777,14 @@
                 this.x -= directionX;
                 this.y -= directionY;
             } else {
-                if (this.x !== this.baseX) {
-                    let dx = this.x - this.baseX;
-                    this.x -= dx / 15;
+                let targetX = this.baseX;
+                let targetY = this.baseY + Math.sin(this.angle) * 15;
+
+                if (this.x !== targetX) {
+                    this.x -= (this.x - targetX) / 15;
                 }
-                if (this.y !== this.baseY) {
-                    let dy = this.y - this.baseY;
-                    this.y -= dy / 15;
+                if (this.y !== targetY) {
+                    this.y -= (this.y - targetY) / 15;
                 }
             }
         }
@@ -766,7 +792,6 @@
 
     function initParticles() {
         particles = [];
-        // 3. Оптимизировано количество частиц (400 для desktop, 150 для mobile)
         let amount = width < 768 ? 150 : 400;
         for (let i = 0; i < amount; i++) {
             let x = Math.random() * width;
@@ -777,22 +802,51 @@
             
             particles.push(new Particle(x, y));
         }
+
+        if (prefersReducedMotion) {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].draw();
+            }
+        }
     }
 
     function animateParticles() {
+        if (prefersReducedMotion) return;
+
         ctx.clearRect(0, 0, width, height);
         for (let i = 0; i < particles.length; i++) {
             particles[i].update();
             particles[i].draw();
         }
-        requestAnimationFrame(animateParticles);
+        canvasAnimationId = requestAnimationFrame(animateParticles);
     }
 
     initParticles();
-    animateParticles();
+    
+    if (!prefersReducedMotion) {
+        animateParticles();
+    }
 
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            cancelAnimationFrame(canvasAnimationId);
+            if (!prefersReducedMotion) cancelAnimationFrame(lenisRafId);
+        } else {
+            if (!prefersReducedMotion) {
+                canvasAnimationId = requestAnimationFrame(animateParticles);
+                lenisRafId = requestAnimationFrame(raf);
+            }
+        }
+    });
+
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        initParticles();
+        resizeCanvas();
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            initParticles();
+        }, 200);
     });
 </script>
 
