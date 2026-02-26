@@ -16,19 +16,15 @@
 
     <link rel="icon" type="image/png" href="./logo.png">
 
-    <!-- Swiper -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Raleway:wght@700;900&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Raleway:wght@700;900&display=swap" rel="stylesheet">
 
-    <!-- Наши стили -->
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
@@ -45,7 +41,7 @@
             <a href="#services">Услуги</a>
             <a href="#artists">Артисты</a>
         </nav>
-        <a href="https://t.me/music_for_native_bot" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо">ОТПРАВИТЬ ДЕМО</a>
+        <a href="https://t.me/music_for_native_bot" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо"></a>
     </header>
 
     <section class="hero" id="about">
@@ -54,9 +50,7 @@
 
         <div class="hero-content">
             <h1 class="hero-title">NATIVE</h1>
-            <p class="hero-intro">
-    
-            </p>
+            <p class="hero-intro"></p>
         </div>
     </section>
 
@@ -80,6 +74,9 @@
     <section class="section" id="artists">
         <div class="section-header reveal">
             <h2 class="section-title">Наши артисты</h2>
+        </div>
+
+        <div class="slider-nav-wrapper reveal">
             <div class="slider-nav">
                 <div class="nav-arrow main-prev" role="button" tabindex="0" aria-label="Предыдущий артист">
                     <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
@@ -92,8 +89,7 @@
 
         <div class="swiper artistSwiper reveal">
             <div class="swiper-wrapper" id="artists-wrapper">
-                <!-- Артисты рендерятся через JS из artists.js -->
-            </div>
+                </div>
         </div>
     </section>
 
@@ -103,68 +99,7 @@
         </div>
 
         <div class="services-grid">
-
-            <div class="service-card reveal">
-                <i class="fa-solid fa-camera service-icon"></i>
-                <h3>Фото и видео съёмка:</h3>
-                <ul>
-                    <li>Обсуждение идей и концепций</li>
-                    <li>Подбор референсов и согласование</li>
-                    <li>Подбор локаций, образов, реквизита</li>
-                    <li>Полноценная съемка, обработка и монтаж</li>
-                    <li>Передача материалов в высоком разрешении</li>
-                    <li>Съемка бэкстейджа</li>
-                </ul>
-                <div class="service-footer">
-                    Материалы для соц. сетей артиста, а также для использования в промо.
-                </div>
             </div>
-
-            <div class="service-card reveal">
-                <i class="fa-solid fa-pen-nib service-icon"></i>
-                <h3>Дизайн-пакет:</h3>
-                <ul>
-                    <li>Обложка к треку</li>
-                    <li>Баннер VK (ПК и мобильная версия)</li>
-                    <li>YouTube баннер</li>
-                    <li>Анимация обложки (квадрат и сторис)</li>
-                    <li>Анимация на полный трек (16:9)</li>
-                </ul>
-                <div class="service-footer">
-                    Материалы для соц. сетей артиста, а также для сниппетов и промо.
-                </div>
-            </div>
-
-            <div class="service-card reveal">
-                <i class="fa-solid fa-chart-line service-icon"></i>
-                <h3>Анализ и рекомендации:</h3>
-                <ul>
-                    <li>По сведению и мастерингу</li>
-                    <li>По структуре, подаче и инструменталу</li>
-                    <li>Консультация и помощь в оформлении юр. документов</li>
-                    <li>Анализ визуала и креативов</li>
-                    <li>Анализ образа и концепции артиста</li>
-                    <li>Подбор референсов и стратегии</li>
-                    <li>Составление и оформление райдера</li>
-                </ul>
-            </div>
-
-            <div class="service-card reveal">
-                <i class="fa-solid fa-headphones service-icon"></i>
-                <h3>Работа на студии:</h3>
-                <ul>
-                    <li>Гострайтинг</li>
-                    <li>Создание бита</li>
-                    <li>Запись и сведение трека</li>
-                    <li>Фонограмма трека</li>
-                    <li>Мультитрек проекта</li>
-                    <li>Демоверсия трека</li>
-                    <li>Финальная версия трека</li>
-                    <li>Трек под ключ</li>
-                </ul>
-            </div>
-
-        </div>
     </section>
 
     <section class="section socials-section reveal">
@@ -189,11 +124,9 @@
 
 </div>
 
-<!-- Библиотеки (должны быть ДО наших модулей) -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 
-<!-- Наш код (type="module" — это важно!) -->
 <script type="module" src="./js/main.js"></script>
 
 </body>
