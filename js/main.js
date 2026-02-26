@@ -3,7 +3,7 @@
 // ============================================================
 
 import { renderArtists, getSwiperInstance } from './artists.js';
-import { resizeCanvas, initParticles, animateParticles } from './canvas.js';
+import { resizeCanvas, initParticles, animateParticles, initStars, animateStars } from './canvas.js';
 import { initReveal } from './animations.js';
 import { renderServices, renderStats, renderSiteConfig } from './content.js';
 
@@ -22,7 +22,7 @@ if (!prefersReducedMotion) {
     });
 }
 
-// ---- Единый RAF loop ----
+// ---- Единый RAF loop — hero canvas + звёзды + lenis ----
 function renderLoop(time) {
     let dt = time - lastTime;
     lastTime = time;
@@ -31,6 +31,7 @@ function renderLoop(time) {
     if (!prefersReducedMotion) {
         if (lenis) lenis.raf(time);
         animateParticles(dt);
+        animateStars(dt);    // звёзды за слайдером
     }
 
     globalRafId = requestAnimationFrame(renderLoop);
@@ -53,22 +54,22 @@ window.addEventListener('resize', () => {
     resizeTimeout = setTimeout(() => {
         resizeCanvas();
         initParticles(prefersReducedMotion);
+        initStars(prefersReducedMotion);    // пересчитываем звёзды при resize
         const swiper = getSwiperInstance();
         if (swiper) swiper.update();
     }, 250);
 });
 
-// ---- Canvas запускаем сразу — не зависит от данных ----
+// ---- Запуск canvas — не зависит от данных ----
 resizeCanvas();
 initParticles(prefersReducedMotion);
+initStars(prefersReducedMotion);
 
 if (!prefersReducedMotion) {
     globalRafId = requestAnimationFrame(renderLoop);
 }
 
-// ---- Данные грузим параллельно, initReveal — строго после ----
-// Promise.allSettled: даже если одна функция упала, остальные выполнятся
-// initReveal в .then() — анимации запускаются когда все карточки уже в DOM
+// ---- Данные параллельно, initReveal строго после ----
 Promise.allSettled([
     renderArtists(),
     renderServices(),
