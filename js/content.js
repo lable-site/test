@@ -18,7 +18,11 @@ export async function renderServices() {
 
         const services = await res.json();
 
-        if (!services || services.length === 0) return;
+        if (!services || services.length === 0) {
+            const section = document.getElementById('services');
+            if (section) section.style.display = 'none';
+            return;
+        }
 
         wrapper.innerHTML = '';
 
