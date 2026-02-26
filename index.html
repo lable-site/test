@@ -57,6 +57,11 @@
             overflow: hidden;
         }
 
+        /* GPU Acceleration for heavy animating elements */
+        .swiper-slide, .artist-card, .reveal, .service-card::before {
+            will-change: transform, opacity;
+        }
+
         .header {
             position: fixed;
             top: 0; left: 0; width: 100%;
@@ -453,6 +458,13 @@
             transform: translateY(0);
         }
 
+        /* Responsive Breakpoints Optimization */
+        @media (max-width: 480px) {
+            .section { padding: 80px 0; }
+            .hero-title { font-size: clamp(40px, 12vw, 60px); }
+            .section-header { padding: 0 5% 30px; }
+        }
+
         @media (max-width: 768px) {
             .header { height: 70px; }
             .header-nav { display: none; } 
@@ -472,6 +484,16 @@
             
             .social-links { flex-direction: column; }
             footer { flex-direction: column; gap: 15px; text-align: center; }
+        }
+
+        @media (min-width: 1024px) {
+            .hero-content { max-width: 1000px; }
+            .section-header, .services-grid { padding: 0 5%; }
+        }
+
+        @media (min-width: 1440px) {
+            .hero-content { max-width: 1100px; }
+            .service-card { padding: 50px; }
         }
 
         @supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
@@ -664,23 +686,35 @@
 
 <script>
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let lenisRafId;
+    let lenis;
+    let globalRafId;
+    let lastTime = performance.now();
 
+    // 1. Unified Event Loop Architecture (Lenis + Canvas)
     if (!prefersReducedMotion) {
-        const lenis = new Lenis({
+        lenis = new Lenis({
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             smoothWheel: true,
             touchMultiplier: 2, 
         });
-
-        function raf(time) {
-            lenis.raf(time);
-            lenisRafId = requestAnimationFrame(raf);
-        }
-        lenisRafId = requestAnimationFrame(raf);
     }
 
+    function renderLoop(time) {
+        let dt = time - lastTime;
+        lastTime = time;
+        
+        // Prevent huge delta jumps if tab was inactive
+        if (dt > 100) dt = 16.6; 
+        
+        if (!prefersReducedMotion) {
+            if (lenis) lenis.raf(time);
+            animateParticles(dt);
+        }
+        globalRafId = requestAnimationFrame(renderLoop);
+    }
+
+    // 2. Intersection Observer
     const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
@@ -697,6 +731,7 @@
         document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
     }
 
+    // 3. Swiper Configuration Refactored for Production Desktop UX
     new Swiper(".artistSwiper", {
         effect: "coverflow",
         grabCursor: true,
@@ -704,6 +739,16 @@
         loop: true,
         speed: 800,
         slidesPerView: "auto",
+        loopedSlides: 4, // Ensures clone generation matches slidesPerView: auto without layout thrashing
+        watchSlidesProgress: true, // Prevents layout repaints
+        touchRatio: 1.5,
+        resistanceRatio: 0.85,
+        threshold: 10, // Prevents accidental dragging/clicks during scroll
+        mousewheel: {
+            forceToAxis: true, // Crucial: Allows Lenis vertical scroll, takes horizontal trackpad slide
+            releaseOnEdges: true, // Failsafe to allow native scroll continuation
+            sensitivity: 0.5,
+        },
         coverflowEffect: {
             rotate: 0,
             stretch: 50,
@@ -714,23 +759,40 @@
         navigation: {
             nextEl: ".main-next",
             prevEl: ".main-prev",
+        },
+        breakpoints: {
+            // Mobile handles default settings, Desktop gets enhanced stability
+            768: {
+                coverflowEffect: { stretch: 45 }
+            }
         }
     });
 
+    // 4. Time-Based High-Performance Canvas
     const canvas = document.getElementById('hero-canvas');
-    const ctx = canvas.getContext('2d');
+    const heroSection = document.getElementById('about');
+    const ctx = canvas.getContext('2d', { alpha: false }); // Minor GPU optimization
     let width, height, particles;
-    let canvasAnimationId;
 
     function resizeCanvas() {
-        const dpr = window.devicePixelRatio || 1;
-        width = window.innerWidth;
-        height = window.innerHeight;
+        // Cap DPR to 2 to prevent extreme CPU load on 4K/Retina displays
+        const dpr = Math.min(window.devicePixelRatio || 1, 2); 
+        // Bind size strictly to hero section to prevent mobile URL bar scroll jumps
+        const rect = heroSection.getBoundingClientRect(); 
+        
+        width = rect.width;
+        height = rect.height;
+        
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         canvas.style.width = width + 'px';
         canvas.style.height = height + 'px';
+        
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        
+        // Draw baseline dark bg because alpha:false
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--native-dark').trim();
+        ctx.fillRect(0, 0, width, height);
     }
     resizeCanvas();
 
@@ -756,12 +818,11 @@
             ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.fill();
+            ctx.fill(); // Dropped closePath() for micro-optimization on primitive shapes
         }
 
-        update() {
-            this.angle += 0.02;
+        update(timeScale) {
+            this.angle += 0.02 * timeScale;
 
             let dx = mouse.x - this.x;
             let dy = mouse.y - this.y;
@@ -774,17 +835,17 @@
                 let directionX = forceDirectionX * force * this.density;
                 let directionY = forceDirectionY * force * this.density;
                 
-                this.x -= directionX;
-                this.y -= directionY;
+                this.x -= directionX * timeScale;
+                this.y -= directionY * timeScale;
             } else {
                 let targetX = this.baseX;
                 let targetY = this.baseY + Math.sin(this.angle) * 15;
 
                 if (this.x !== targetX) {
-                    this.x -= (this.x - targetX) / 15;
+                    this.x -= ((this.x - targetX) / 15) * timeScale;
                 }
                 if (this.y !== targetY) {
-                    this.y -= (this.y - targetY) / 15;
+                    this.y -= ((this.y - targetY) / 15) * timeScale;
                 }
             }
         }
@@ -792,61 +853,68 @@
 
     function initParticles() {
         particles = [];
-        let amount = width < 768 ? 150 : 400;
+        // Calculate amount dynamically based on area, clamping between 80 and 300
+        let area = width * height;
+        let amount = Math.max(80, Math.min(Math.floor(area / 10000), 300));
+        if (prefersReducedMotion) amount = 0;
+
         for (let i = 0; i < amount; i++) {
             let x = Math.random() * width;
             let wave1 = height / 2 + Math.sin(x * 0.005) * 150;
             let wave2 = height / 2 + Math.cos(x * 0.005) * 150;
             
             let y = (Math.random() > 0.5 ? wave1 : wave2) + (Math.random() * 100 - 50);
-            
             particles.push(new Particle(x, y));
         }
 
         if (prefersReducedMotion) {
-            ctx.clearRect(0, 0, width, height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].draw();
-            }
+            ctx.fillStyle = '#05020a';
+            ctx.fillRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) particles[i].draw();
         }
     }
 
-    function animateParticles() {
-        if (prefersReducedMotion) return;
+    function animateParticles(dt) {
+        if (!dt) return;
+        let timeScale = dt / 16.66; // Normalizes movement independent of refresh rate (60hz vs 144hz)
 
-        ctx.clearRect(0, 0, width, height);
+        // Clear with background color instead of clearRect due to alpha:false
+        ctx.fillStyle = '#05020a'; 
+        ctx.fillRect(0, 0, width, height);
+
         for (let i = 0; i < particles.length; i++) {
-            particles[i].update();
+            particles[i].update(timeScale);
             particles[i].draw();
         }
-        canvasAnimationId = requestAnimationFrame(animateParticles);
     }
 
+    // 5. Initialize and Lifecycle Management
     initParticles();
     
     if (!prefersReducedMotion) {
-        animateParticles();
+        globalRafId = requestAnimationFrame(renderLoop);
     }
 
+    // Handle tab switching safety
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            cancelAnimationFrame(canvasAnimationId);
-            if (!prefersReducedMotion) cancelAnimationFrame(lenisRafId);
+            cancelAnimationFrame(globalRafId);
         } else {
             if (!prefersReducedMotion) {
-                canvasAnimationId = requestAnimationFrame(animateParticles);
-                lenisRafId = requestAnimationFrame(raf);
+                lastTime = performance.now(); // Reset delta base
+                globalRafId = requestAnimationFrame(renderLoop);
             }
         }
     });
 
+    // Handle smooth debounced resizing
     let resizeTimeout;
     window.addEventListener('resize', () => {
-        resizeCanvas();
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
+            resizeCanvas();
             initParticles();
-        }, 200);
+        }, 250);
     });
 </script>
 
