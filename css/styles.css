@@ -264,8 +264,7 @@ html, body {
     padding-top: 20px !important;
     padding-bottom: 70px !important;
 
-    /* СУПЕР-ФИКС: Математически вычисляем отступ, чтобы первая фотка
-       стояла МИЛЛИМЕТР В МИЛЛИМЕТР над первой карточкой услуг на любом экране! */
+    /* Вычисляем отступ, чтобы первая фотка стояла над услугами */
     padding-left: max(var(--layout-x), calc((100vw - 1600px) / 2 + 5vw)) !important;
     padding-right: var(--layout-x) !important;
 }
@@ -277,7 +276,7 @@ html, body {
 .swiper-slide {
     height: auto;
     display: flex;
-    justify-content: center;
+    justify-content: center; /* По умолчанию по центру (для мобилок) */
     align-items: center;
     transition: var(--transition);
     filter: grayscale(100%) brightness(0.3);
@@ -650,22 +649,18 @@ footer {
    RESPONSIVE — ДЕСКТОП (от 1024px)
    ============================================================ */
 @media (min-width: 1024px) {
-    .hero-content { max-width: 1000px; }
-    
-    /* СУПЕР-ФИКС: Фиксируем ширину карточек на ПК, чтобы Swiper мог правильно считать скролл */
     .swiper-slide {
-        width: 340px !important;
+        justify-content: flex-start; /* На ПК прижимаем карточку влево к границе padding'а */
     }
+
+    .hero-content { max-width: 1000px; }
+    /* ИЗМЕНЕНО: удален блок с фиксированной шириной 340px */
 }
 
 @media (min-width: 1440px) {
     .hero-content { max-width: 1100px; }
     .service-card { padding: 50px; }
-
-    /* На огромных экранах карточки чуть крупнее */
-    .swiper-slide {
-        width: 360px !important;
-    }
+    /* ИЗМЕНЕНО: удален блок с фиксированной шириной 360px */
 }
 
 /* ============================================================
