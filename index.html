@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NATIVE | Музыкальный лейбл</title>
     
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lable-site/test/refs/heads/main/logo.png">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -82,8 +84,13 @@
 
         .header-logo:hover { transform: scale(1.05); }
 
-        /* Векторный логотип NATIVE */
-        .logo-svg { width: 35px; height: 35px; fill: var(--text-main); }
+        /* Векторный логотип NATIVE (Белый) */
+        .logo-img { 
+            width: 35px; 
+            height: 35px; 
+            object-fit: contain;
+            filter: invert(1); /* Делаем черный логотип белым */
+        }
         
         .logo-text { 
             font-family: 'Raleway', sans-serif; 
@@ -498,10 +505,7 @@
 
     <header class="header">
         <a href="#" class="header-logo">
-            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20,60 Q40,20 60,60 T100,20" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
-                <path d="M0,80 Q20,40 40,80 T80,40" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
-            </svg>
+            <img src="https://raw.githubusercontent.com/lable-site/test/refs/heads/main/logo.png" alt="NATIVE Logo" class="logo-img">
             <span class="logo-text">NATIVE</span>
         </a>
         <nav class="header-nav">
@@ -539,7 +543,7 @@
                 
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://images.unsplash.com/photo-1520635360276-71f340432f8c?q=80&w=1000&auto=format&fit=crop" alt="Pussykiller">
+                        <img src="https://sun9-24.vkuserphoto.ru/s/v1/ig2/6C_Y4iNdHRUEOTyoZznezRjHJCy-Ejq8BpF5LgTrkfQveP4hmIXy_392B-6rIibYfrDO5_oYK_AVJg5qlCzsN2N0.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0" alt="Pussykiller">
                         <div class="artist-info">
                             <h3>Pussykiller</h3>
                         </div>
@@ -548,7 +552,7 @@
 
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://images.unsplash.com/photo-1516280440502-315183ce564b?q=80&w=1000&auto=format&fit=crop" alt="Я Про Рок">
+                        <img src="https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" alt="Я Про Рок">
                         <div class="artist-info">
                             <h3>Я про рок</h3>
                         </div>
@@ -557,7 +561,7 @@
 
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://images.unsplash.com/photo-1493225457224-b153fdd0e791?q=80&w=1000&auto=format&fit=crop" alt="White Gallows">
+                        <img src="https://sun9-53.vkuserphoto.ru/s/v1/ig2/_eZ8hJvlB5h-0ckNZ99RklPmMgfL7-cDR_8qcH3gqvjxdw2JQeFWHm8Q86cOBjZXMKoHxCuxVpO3n1iFbKQQys7s.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2560x2560&from=bu&cs=2560x0" alt="White Gallows">
                         <div class="artist-info">
                             <h3>White Gallows</h3>
                         </div>
@@ -696,7 +700,7 @@
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     /* =========================================
-       3. СЛАЙДЕР АРТИСТОВ (COVER FLOW - ЦЕНТР)
+       3. СЛАЙДЕР АРТИСТОВ (COVER FLOW - ЦЕНТР) + ФИКС ДЛЯ КОЛЕСИКА МЫШИ
        ========================================= */
     new Swiper(".artistSwiper", {
         effect: "coverflow",
@@ -705,6 +709,9 @@
         loop: true,
         speed: 800,
         slidesPerView: "auto",
+        mousewheel: {
+            forceToAxis: true, // ФИКС: Позволяет крутить слайдер колесиком мыши на ПК
+        },
         coverflowEffect: {
             rotate: 0,
             stretch: 50, // Наложение карточек друг на друга
@@ -732,7 +739,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Отслеживание мыши
+    // Отслеживание мыши для частиц
     const mouse = { x: width / 2, y: height / 2, radius: 150 };
     window.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
@@ -748,7 +755,7 @@
             this.size = Math.random() * 2.5 + 0.5;
             this.density = (Math.random() * 30) + 1;
             this.angle = Math.random() * 360;
-            // Фиолетовые оттенки
+            // Фиолетовые оттенки NATIVE
             this.color = `rgba(${100 + Math.random()*50}, ${30 + Math.random()*40}, ${200 + Math.random()*55}, ${Math.random() * 0.8 + 0.2})`;
         }
 
