@@ -800,17 +800,16 @@
         }
 
         const isLoop = count >= 3;
-        // Optimization: dynamically calculate loopedSlides to prevent layout thrashing
-        const loopCount = isLoop ? Math.min(count, 5) : 0; 
+        const isCentered = count !== 2;
+        const loopCount = isLoop ? Math.min(count, 5) : 0;
 
         swiperInstance = new Swiper(".artistSwiper", {
             effect: "coverflow",
             grabCursor: true,
-            centeredSlides: true,
+            centeredSlides: isCentered,
             initialSlide: 0,
             loop: isLoop,
             loopedSlides: loopCount,
-            loopAdditionalSlides: loopCount,
             loopPreventsSliding: false, 
             normalizeSlideIndex: true,
             observer: true,
@@ -844,27 +843,31 @@
             },
             breakpoints: {
                 0: {
-                    slidesPerView: 1.2,
-                    coverflowEffect: { stretch: 30 },
-                    centeredSlides: true 
+                    slidesPerView: count === 1 ? 1 : 1.2,
+                    coverflowEffect: { stretch: 30 }
                 },
                 768: {
-                    slidesPerView: count === 2 ? 1.2 : 2, 
-                    centeredSlides: count !== 2, 
+                    slidesPerView: count === 2 ? 1.2 : 2,
                     coverflowEffect: { stretch: 45 }
                 },
                 1024: {
                     slidesPerView: count === 2 ? 1.2 : 3,
-                    centeredSlides: count !== 2,
                     coverflowEffect: { stretch: 50 }
+                }
+            },
+            on: {
+                init(swiper) {
+                    if (isLoop) {
+                        swiper.slideToLoop(0, 0, false);
+                    } else {
+                        swiper.slideTo(0, 0, false);
+                    }
                 }
             }
         });
         
-        // Post-init update to ensure accurate rendering and centering
         if(swiperInstance) {
             swiperInstance.update();
-            if(isLoop) swiperInstance.slideToLoop(0, 0);
         }
     }
 
@@ -1101,7 +1104,6 @@
         resizeTimeout = setTimeout(() => {
             resizeCanvas();
             initParticles();
-            // Force swiper update on resize to maintain correct centering
             if(swiperInstance) {
                swiperInstance.update();
             }
