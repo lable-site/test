@@ -3,7 +3,7 @@
 // ============================================================
 
 import { renderArtists, getSwiperInstance } from './artists.js';
-import { resizeCanvas, initParticles, animateParticles, initStars, animateStars } from './canvas.js';
+import { resizeCanvas, animateParticles, initStars, animateStars } from './canvas.js';
 import { initReveal } from './animations.js';
 import { renderServices, renderStats, renderSiteConfig } from './content.js';
 
@@ -31,7 +31,7 @@ function renderLoop(time) {
     if (!prefersReducedMotion) {
         if (lenis) lenis.raf(time);
         animateParticles(dt);
-        animateStars(dt);    // звёзды за слайдером
+        animateStars(dt);    
     }
 
     globalRafId = requestAnimationFrame(renderLoop);
@@ -52,17 +52,15 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        resizeCanvas();
-        initParticles(prefersReducedMotion);
-        initStars(prefersReducedMotion);    // пересчитываем звёзды при resize
+        resizeCanvas(prefersReducedMotion);
+        initStars(prefersReducedMotion);
         const swiper = getSwiperInstance();
         if (swiper) swiper.update();
     }, 250);
 });
 
 // ---- Запуск canvas — не зависит от данных ----
-resizeCanvas();
-initParticles(prefersReducedMotion);
+resizeCanvas(prefersReducedMotion);
 initStars(prefersReducedMotion);
 
 if (!prefersReducedMotion) {
