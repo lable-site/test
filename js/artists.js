@@ -114,6 +114,7 @@ function initSwiper(count) {
             1024: {
                 slidesPerView: count === 1 ? 1 : count === 2 ? 1.5 : 3,
                 coverflowEffect: { stretch: 0, depth: 0 } // Комп: отключаем 3D искажение!
+                centeredSlides: false
             }
         }
     });
