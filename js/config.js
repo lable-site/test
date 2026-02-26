@@ -1,16 +1,15 @@
 // ============================================================
 //  config.js — данные и настройки
-//  Когда будешь подключать Supabase:
-//    1. Замени USE_MOCK на false
-//    2. Вставь свои SUPABASE_URL и SUPABASE_KEY
 // ============================================================
 
-export const USE_MOCK = true; // true = данные из этого файла, false = Supabase
+// МЫ ПОМЕНЯЛИ TRUE НА FALSE! Теперь сайт знает, что нужно идти в Supabase
+export const USE_MOCK = false; 
 
-export const SUPABASE_URL = 'ВСТАВЬ_СЮДА_URL_ИЗ_SUPABASE';
-export const SUPABASE_KEY = 'ВСТАВЬ_СЮДА_ANON_KEY_ИЗ_SUPABASE';
+// Твои ключи доступа к базе данных
+export const SUPABASE_URL = 'https://tazsewyhrqncymqwqffb.supabase.co';
+export const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhenNld3locnFuY3ltcXdxZmZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTE4MzEsImV4cCI6MjA4NzY4NzgzMX0.6epTAUZAcbgT9FTvYyPEXGafbdOSyU4pTdm2ILRIlc8';
 
-// ---- Данные артистов (используются пока USE_MOCK = true) ----
+// Эти данные больше не работают на сайте, но пусть лежат как запасной вариант
 export const mockArtists = [
     {
         name: "Pussykiller",
