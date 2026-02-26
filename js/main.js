@@ -5,7 +5,8 @@
 import { renderArtists, getSwiperInstance } from './artists.js';
 import { resizeCanvas, initParticles, animateParticles } from './canvas.js';
 import { initReveal } from './animations.js';
-
+// ВОТ ЭТА НОВАЯ СТРОЧКА:
+import { renderServices, renderSiteConfig } from './content.js';
 // ---- Глобальные переменные ----
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let lenis = null;
@@ -63,6 +64,8 @@ window.addEventListener('resize', () => {
 resizeCanvas();
 initParticles(prefersReducedMotion);
 renderArtists();
+renderServices();     // Запускаем отрисовку услуг
+renderSiteConfig();   // Запускаем подмену ссылок
 initReveal(prefersReducedMotion);
 
 if (!prefersReducedMotion) {
