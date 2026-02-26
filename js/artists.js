@@ -9,8 +9,9 @@ const ArtistService = {
     async getArtists() {
         if (USE_MOCK) return mockArtists;
 
+        // Я исправил эту строчку, чтобы она не искала несуществующие колонки
         const res = await fetch(
-            `${SUPABASE_URL}/rest/v1/artists?order=sort_order&is_visible=eq.true`,
+            `${SUPABASE_URL}/rest/v1/artists?select=*&order=id`,
             { headers: { 'apikey': SUPABASE_KEY } }
         );
         if (!res.ok) throw new Error('Supabase: не удалось загрузить артистов');
