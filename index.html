@@ -2,16 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    
+    <meta name="description" content="NATIVE — Музыкальный лейбл и надежный партнер на каждом этапе творческого пути.">
+    <meta property="og:title" content="NATIVE | Музыкальный лейбл">
+    <meta property="og:description" content="Мы предлагаем широкий спектр услуг для артистов: от записи и сведения до съемки клипов и продвижения.">
+    <meta property="og:image" content="./logo.png">
+
     <title>NATIVE | Музыкальный лейбл</title>
     
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lable-site/test/refs/heads/main/logo.png">
+    <link rel="icon" type="image/png" href="./logo.png">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Raleway:wght@700;900&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Raleway:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
@@ -43,6 +50,11 @@
         ::-webkit-scrollbar-track { background: var(--native-dark); }
         ::-webkit-scrollbar-thumb { background: #2a1b42; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--native-purple); }
+
+        /* 8. GPU-оптимизация для анимируемых и hover-элементов */
+        .hero-title, .hero-intro, .artist-card, .artist-info h3, .service-card, .btn-primary, .social-btn, .nav-arrow, .header-logo {
+            will-change: transform, opacity;
+        }
 
         .page-wrapper {
             position: relative;
@@ -128,7 +140,8 @@
 
         .hero {
             position: relative;
-            width: 100vw;
+            /* 2. Исправление layout-бага с 100vw */
+            width: 100%;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -474,7 +487,7 @@
 
     <header class="header">
         <a href="#" class="header-logo">
-            <img src="https://raw.githubusercontent.com/lable-site/test/refs/heads/main/logo.png" alt="NATIVE Logo" class="logo-img">
+            <img src="./logo.png" alt="NATIVE Logo" class="logo-img">
             <span class="logo-text">NATIVE</span>
         </a>
         <nav class="header-nav">
@@ -512,7 +525,7 @@
                 
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://sun9-24.vkuserphoto.ru/s/v1/ig2/6C_Y4iNdHRUEOTyoZznezRjHJCy-Ejq8BpF5LgTrkfQveP4hmIXy_392B-6rIibYfrDO5_oYK_AVJg5qlCzsN2N0.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0" alt="Pussykiller">
+                        <img src="https://sun9-24.vkuserphoto.ru/s/v1/ig2/6C_Y4iNdHRUEOTyoZznezRjHJCy-Ejq8BpF5LgTrkfQveP4hmIXy_392B-6rIibYfrDO5_oYK_AVJg5qlCzsN2N0.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080&from=bu&cs=1080x0" loading="lazy" decoding="async" alt="Pussykiller">
                         <div class="artist-info">
                             <h3>Pussykiller</h3>
                         </div>
@@ -521,7 +534,7 @@
 
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" alt="Я Про Рок">
+                        <img src="https://sun9-55.vkuserphoto.ru/s/v1/ig2/92qUFajamFNXNWcTSGBzmTh8kOtAJYJj39ZrQDO4tg-qmlk1cVMee1ThJahYoq_PHpAXTJtYSduK21YI86Veo98Q.jpg?quality=95&as=32x35,48x52,72x78,108x117,160x173,240x260,360x389,480x519,540x584,640x692,720x779,836x904&from=bu&cs=836x0" loading="lazy" decoding="async" alt="Я Про Рок">
                         <div class="artist-info">
                             <h3>Я про рок</h3>
                         </div>
@@ -530,7 +543,7 @@
 
                 <div class="swiper-slide">
                     <div class="artist-card">
-                        <img src="https://sun9-53.vkuserphoto.ru/s/v1/ig2/_eZ8hJvlB5h-0ckNZ99RklPmMgfL7-cDR_8qcH3gqvjxdw2JQeFWHm8Q86cOBjZXMKoHxCuxVpO3n1iFbKQQys7s.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2560x2560&from=bu&cs=2560x0" alt="White Gallows">
+                        <img src="https://sun9-53.vkuserphoto.ru/s/v1/ig2/_eZ8hJvlB5h-0ckNZ99RklPmMgfL7-cDR_8qcH3gqvjxdw2JQeFWHm8Q86cOBjZXMKoHxCuxVpO3n1iFbKQQys7s.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2560x2560&from=bu&cs=2560x0" loading="lazy" decoding="async" alt="White Gallows">
                         <div class="artist-info">
                             <h3>White Gallows</h3>
                         </div>
@@ -662,6 +675,7 @@
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+    // 5. Убран mousewheel у Swiper для устранения конфликта со скроллом Lenis
     new Swiper(".artistSwiper", {
         effect: "coverflow",
         grabCursor: true,
@@ -669,9 +683,6 @@
         loop: true,
         speed: 800,
         slidesPerView: "auto",
-        mousewheel: {
-            forceToAxis: true,
-        },
         coverflowEffect: {
             rotate: 0,
             stretch: 50,
@@ -730,7 +741,8 @@
             let dy = mouse.y - this.y;
             let distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance < mouse.radius) {
+            // 4. Добавлена проверка на distance > 0 для избежания NaN
+            if (distance < mouse.radius && distance > 0) {
                 let forceDirectionX = dx / distance;
                 let forceDirectionY = dy / distance;
                 let force = (mouse.radius - distance) / mouse.radius;
@@ -754,7 +766,8 @@
 
     function initParticles() {
         particles = [];
-        let amount = width < 768 ? 400 : 1000;
+        // 3. Оптимизировано количество частиц (400 для desktop, 150 для mobile)
+        let amount = width < 768 ? 150 : 400;
         for (let i = 0; i < amount; i++) {
             let x = Math.random() * width;
             let wave1 = height / 2 + Math.sin(x * 0.005) * 150;
