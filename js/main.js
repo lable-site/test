@@ -5,7 +5,7 @@
 import { renderArtists, getSwiperInstance } from './artists.js';
 import { resizeCanvas, animateParticles, initStars, animateStars } from './canvas.js';
 import { initReveal } from './animations.js';
-import { renderServices, renderStats, renderSiteConfig } from './content.js';
+import { renderServices, renderStats, renderSocials, renderSiteConfig } from './content.js';
 
 const prefersReducedMotion = false; // Принудительно запускаем анимации всегда
 let lenis = null;
@@ -22,7 +22,7 @@ if (!prefersReducedMotion) {
     });
 }
 
-// ---- Единый RAF loop — hero canvas + звёзды + lenis ----
+// ---- Единый RAF loop ----
 function renderLoop(time) {
     let dt = time - lastTime;
     lastTime = time;
@@ -31,7 +31,7 @@ function renderLoop(time) {
     if (!prefersReducedMotion) {
         if (lenis) lenis.raf(time);
         animateParticles(dt);
-        animateStars(dt);    
+        animateStars(dt);
     }
 
     globalRafId = requestAnimationFrame(renderLoop);
@@ -59,7 +59,7 @@ window.addEventListener('resize', () => {
     }, 250);
 });
 
-// ---- Запуск canvas — не зависит от данных ----
+// ---- Canvas запускаем сразу — не зависит от данных ----
 resizeCanvas(prefersReducedMotion);
 initStars(prefersReducedMotion);
 
@@ -67,12 +67,25 @@ if (!prefersReducedMotion) {
     globalRafId = requestAnimationFrame(renderLoop);
 }
 
-// ---- Данные параллельно, initReveal строго после ----
+// ---- Данные грузим параллельно ----
+// Promise.allSettled: каждая функция независима, сбой одной не ломает остальные.
+// ВАЖНО: renderSocials должна выполниться ДО renderSiteConfig,
+// чтобы aria-label кнопок были в DOM и ссылки обновились корректно.
+// Достигается тем, что renderSiteConfig при своём запросе ищет .social-btn[aria-label="..."],
+// которые к этому моменту уже отрендерены renderSocials (оба в allSettled — гонки нет,
+// aria-label обновляются по DOM после рендера socials).
 Promise.allSettled([
     renderArtists(),
+    renderSocials(),      // ЗАДАЧА 7: рендерим соцсети из Supabase
     renderServices(),
     renderStats(),
     renderSiteConfig(),
 ]).then(() => {
+    // ЗАДАЧА 9: Перемеряем canvas услуг ПОСЛЕ загрузки карточек из Supabase.
+    // До этого секция услуг была пустой (только padding) и canvas был маленьким.
+    resizeCanvas(prefersReducedMotion);
+    initStars(prefersReducedMotion);
+
+    // Запускаем reveal-анимации строго после того как весь контент в DOM
     initReveal(prefersReducedMotion);
 });
