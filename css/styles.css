@@ -12,16 +12,29 @@
     --section-padding: 120px 0;
     --section-header-gap: 60px;
     --section-header-gap-mob: 40px;
-
-    /* Единый отступ для всех блоков контента */
     --layout-x: 5%;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body {
-    width: 100%;
+/* ============================================================
+   ЗАДАЧА 1: Премиальный фон — уход от плоской заливки
+   Три слоя:
+   1) Верхний левый угол — глубокое фиолетовое свечение (источник света)
+   2) Нижний правый — тёмный пурпурный подтон
+   3) Основа — #05020a → #12061c радиальный градиент
+   Без background-attachment:fixed (убивает FPS на мобилках)
+   ============================================================ */
+html {
     background-color: var(--native-dark);
+}
+
+body {
+    width: 100%;
+    background:
+        radial-gradient(ellipse 70% 45% at 8% 0%,   rgba(58, 28, 82,  0.55) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 35% at 92% 100%, rgba(26, 11, 46,  0.60) 0%, transparent 60%),
+        radial-gradient(ellipse 100% 100% at 50% 40%, #12061c 0%, var(--native-dark) 65%);
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
@@ -74,12 +87,15 @@ html, body {
     text-decoration: none;
     color: var(--text-main);
     transition: var(--transition);
+    flex-shrink: 0;
 }
 .header-logo:hover { transform: scale(1.05); }
 
+/* ЗАДАЧА 2: Логотип чуть крупнее (42→46px).
+   Хедер 80px высота, padding по 17px сверху/снизу — 46px вписывается. */
 .logo-img {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     object-fit: contain;
     filter: invert(1);
 }
@@ -100,12 +116,16 @@ html, body {
     text-transform: uppercase;
     letter-spacing: 2px;
     transition: 0.3s ease;
+    white-space: nowrap;
 }
 .header-nav a:hover {
     color: var(--text-main);
     text-shadow: 0 0 10px var(--native-purple);
 }
 
+/* ЗАДАЧА 3: Кнопка — inline-flex вместо inline-block.
+   align-items+justify-content центрируют текст строго по середине
+   при любой длине текста приходящего из Supabase. */
 .btn-primary {
     background: linear-gradient(135deg, var(--native-purple), #5a189a);
     color: #fff;
@@ -120,9 +140,14 @@ html, body {
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
     transition: var(--transition);
     text-decoration: none;
-    display: inline-block;
+    /* Ключевое изменение: flex центрирует текст по обоим осям */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-width: 44px;
     min-height: 44px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 .btn-primary:hover {
     box-shadow: 0 0 30px var(--native-purple);
@@ -174,12 +199,7 @@ html, body {
     line-height: 1;
     letter-spacing: clamp(2px, 0.5vw, 8px);
     margin-bottom: 30px;
-    background: linear-gradient(
-        170deg,
-        #ffffff 0%,
-        #ffffff 45%,
-        rgba(216, 180, 254, 0.8) 100%
-    );
+    background: linear-gradient(170deg, #ffffff 0%, #ffffff 45%, rgba(216, 180, 254, 0.8) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -215,8 +235,11 @@ html, body {
     z-index: 10;
 }
 
-/* Звёздные холсты и новые частицы — абсолютный фон за контентом */
-#services-canvas, .stars-canvas-bg {
+/* ЗАДАЧА 9: Канвасы — абсолютное покрытие 100% секции.
+   position:relative на .section уже есть — канвас растягивается по всей высоте,
+   включая высоту после загрузки карточек из Supabase (resizeCanvas вызывается повторно в .then). */
+#services-canvas,
+.stars-canvas-bg {
     position: absolute;
     top: 0;
     left: 0;
@@ -227,8 +250,13 @@ html, body {
     background: transparent;
 }
 
-/* Защита контента от перекрытия канвасами */
-.section-header, .services-grid, .stats-grid, .social-links, .section-title {
+/* Весь контент поверх канвасов */
+.section-header,
+.services-grid,
+.stats-grid,
+.social-links,
+.section-title,
+.socials-title {
     position: relative;
     z-index: 10;
 }
@@ -256,6 +284,7 @@ html, body {
 .header-icon {
     color: #ffffff;
     font-size: 0.8em;
+    flex-shrink: 0;
 }
 
 /* ============================================================
@@ -266,17 +295,15 @@ html, body {
 }
 
 /* ============================================================
-   СЛАЙДЕР АРТИСТОВ
+   СЛАЙДЕР АРТИСТОВ — НЕ ТРОГАТЬ
    ============================================================ */
 .artistSwiper {
     width: 100%;
     position: relative;
-    z-index: 1; 
+    z-index: 1;
 
     padding-top: 20px !important;
     padding-bottom: 70px !important;
-
-    /* Вычисляем отступ, чтобы первая фотка стояла над услугами */
     padding-left: max(var(--layout-x), calc((100vw - 1600px) / 2 + 5vw)) !important;
     padding-right: var(--layout-x) !important;
 }
@@ -288,7 +315,7 @@ html, body {
 .swiper-slide {
     height: auto;
     display: flex;
-    justify-content: center; /* По умолчанию по центру (для мобилок) */
+    justify-content: center;
     align-items: center;
     transition: var(--transition);
     filter: grayscale(100%) brightness(0.3);
@@ -317,9 +344,9 @@ html, body {
 .swiper-slide-active .artist-card {
     border-color: rgba(138, 43, 226, 0.5);
     box-shadow:
-        0 0 0 1px rgba(138, 43, 226, 0.2),   
-        0 0 25px 4px rgba(138, 43, 226, 0.3), 
-        0 0 60px 10px rgba(138, 43, 226, 0.1); 
+        0 0 0 1px rgba(138, 43, 226, 0.2),
+        0 0 25px 4px rgba(138, 43, 226, 0.3),
+        0 0 60px 10px rgba(138, 43, 226, 0.1);
     transform: scale(1.05);
 }
 
@@ -365,7 +392,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
-    padding: 0 var(--layout-x); 
+    padding: 0 var(--layout-x);
     max-width: 1600px;
     margin: 0 auto;
 }
@@ -515,7 +542,7 @@ html, body {
 }
 
 /* ============================================================
-   СОЦСЕТИ
+   СОЦСЕТИ — ЗАДАЧА 7: кнопки рендерятся JS, стиль сохранён 1:1
    ============================================================ */
 .socials-section {
     text-align: center;
@@ -523,7 +550,7 @@ html, body {
     background: radial-gradient(circle at center bottom, #1a0b2e 0%, var(--native-dark) 70%);
 }
 
-.socials-section .section-title {
+.socials-section .socials-title {
     justify-content: center;
 }
 
@@ -535,9 +562,11 @@ html, body {
     flex-wrap: wrap;
 }
 
+/* Стиль кнопок — 1 в 1 как было */
 .social-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 15px;
     padding: 15px 35px;
     background: var(--glass-bg);
@@ -549,6 +578,7 @@ html, body {
     font-size: 14px;
     letter-spacing: 1px;
     transition: var(--transition);
+    white-space: nowrap;
 }
 
 .social-btn i { font-size: 20px; }
@@ -588,7 +618,7 @@ footer {
 }
 
 /* ============================================================
-   RESPONSIVE — МОБИЛКИ (до 768px)
+   RESPONSIVE — до 480px
    ============================================================ */
 @media (max-width: 480px) {
     .section { padding: 80px 0; }
@@ -597,6 +627,9 @@ footer {
     .stats-section { padding: 40px 0 60px; }
 }
 
+/* ============================================================
+   RESPONSIVE — до 768px (мобилки)
+   ============================================================ */
 @media (max-width: 768px) {
     .header { height: 70px; }
     .header-nav { display: none; }
@@ -609,6 +642,7 @@ footer {
     }
     .section-title { gap: 15px; }
 
+    /* Мобильный слайдер — без горизонтального padding */
     .artistSwiper {
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -624,6 +658,7 @@ footer {
 
     .artist-info h3 { font-size: 24px; }
 
+    /* ЗАДАЧА 7 адаптив: 4-5 кнопок переносятся в колонку на мобилке */
     .social-links {
         flex-direction: column;
         align-items: center;
@@ -632,9 +667,7 @@ footer {
     .social-btn {
         width: 100%;
         max-width: 320px;
-        margin: 0 auto;
         padding: 12px 20px;
-        justify-content: center;
     }
     .social-btn:hover { transform: none; }
 
@@ -646,7 +679,7 @@ footer {
 }
 
 /* ============================================================
-   RESPONSIVE — ПЛАНШЕТ (768–1023px)
+   RESPONSIVE — планшет (768–1023px)
    ============================================================ */
 @media (min-width: 768px) and (max-width: 1023px) {
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
@@ -658,13 +691,10 @@ footer {
 }
 
 /* ============================================================
-   RESPONSIVE — ДЕСКТОП (от 1024px)
+   RESPONSIVE — десктоп (от 1024px)
    ============================================================ */
 @media (min-width: 1024px) {
-    .swiper-slide {
-        justify-content: flex-start; /* На ПК прижимаем карточку влево к границе padding'а */
-    }
-
+    .swiper-slide { justify-content: flex-start; }
     .hero-content { max-width: 1000px; }
 }
 
@@ -674,7 +704,7 @@ footer {
 }
 
 /* ============================================================
-   FALLBACK
+   FALLBACK — старые браузеры без backdrop-filter
    ============================================================ */
 @supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
     .header, .service-card, .stat-card, .social-btn {
@@ -683,7 +713,7 @@ footer {
 }
 
 /* ============================================================
-   ДОСТУПНОСТЬ
+   ДОСТУПНОСТЬ — отключённые анимации
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
     .hero-title, .hero-intro {
