@@ -1,20 +1,39 @@
 // ============================================================
 //  artists.js — загрузка артистов и инициализация слайдера
+//  🚫 НАСТРОЙКИ SWIPER НЕ ТРОГАТЬ — вылизаны до пикселя
 // ============================================================
 
 import { USE_MOCK, mockArtists, SUPABASE_URL, SUPABASE_KEY } from './config.js';
 
-// ---- Сервис данных ----
+// ---- Сервис данных (с кэшированием в sessionStorage) ----
 const ArtistService = {
     async getArtists() {
         if (USE_MOCK) return mockArtists;
+
+        // КЭШ: та же логика что в content.js — сначала проверяем память,
+        // потом идём в сеть. Подробное объяснение в content.js.
+        const cacheKey = 'native_v1_artists';
+        try {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) return JSON.parse(cached);
+        } catch (e) {
+            // sessionStorage недоступен — продолжаем без кэша
+        }
 
         const res = await fetch(
             `${SUPABASE_URL}/rest/v1/artists?select=*&order=id`,
             { headers: { 'apikey': SUPABASE_KEY } }
         );
         if (!res.ok) throw new Error('Supabase: не удалось загрузить артистов');
-        return res.json();
+        const data = await res.json();
+
+        try {
+            sessionStorage.setItem(cacheKey, JSON.stringify(data));
+        } catch (e) {
+            // Кэш переполнен — не критично
+        }
+
+        return data;
     }
 };
 
@@ -31,8 +50,8 @@ function createArtistSlide(artist) {
     img.alt = artist.name || '';
     img.loading = 'lazy';
     img.decoding = 'async';
-    // Запрещаем браузеру перехватывать событие перетаскивания картинки
-    img.draggable = false; 
+    // ⚠️  width/height НЕ СТАВИМ — сломает CSS aspect-ratio
+    img.draggable = false;
 
     const info = document.createElement('div');
     info.className = 'artist-info';
@@ -52,6 +71,16 @@ function createArtistSlide(artist) {
 let swiperInstance = null;
 
 function initSwiper(count) {
+    // ЗАЩИТА ОТ УПАВШЕГО CDN:
+    // Если скрипт swiper-bundle.min.js не загрузился (плохой интернет,
+    // CDN лёг, корпоративный файрвол заблокировал) — переменная Swiper
+    // будет undefined. Без этой проверки "new Swiper(...)" бросит ошибку
+    // и весь сайт замёрзнет. С проверкой — просто нет слайдера, всё остальное живо.
+    if (typeof Swiper === 'undefined') {
+        console.warn('Swiper не загрузился (CDN недоступен). Слайдер артистов отключён.');
+        return;
+    }
+
     if (swiperInstance) {
         swiperInstance.destroy(true, true);
         swiperInstance = null;
@@ -59,6 +88,7 @@ function initSwiper(count) {
 
     if (count === 0) return;
 
+    // 🚫 ВСЁ НИЖЕ — НАСТРОЙКИ SWIPER. НЕ ТРОГАТЬ. 🚫
     swiperInstance = new Swiper('.artistSwiper', {
         effect: 'coverflow',
         loop: false,
@@ -67,7 +97,7 @@ function initSwiper(count) {
         allowTouchMove: true,
         simulateTouch: true,
         watchSlidesProgress: true,
-        watchOverflow: false, 
+        watchOverflow: false,
         initialSlide: 0,
         speed: 800,
         touchRatio: 1.5,
@@ -103,11 +133,12 @@ function initSwiper(count) {
                 centeredSlides: false,
                 spaceBetween: 30,
                 // Секретный фикс: удлиняем трассу, чтобы слайды могли дотянуться до левого края без отскока
-                slidesOffsetAfter: count > 1 ? 800 : 0, 
+                slidesOffsetAfter: count > 1 ? 800 : 0,
                 coverflowEffect: { stretch: 0, depth: 0 }
             }
         }
     });
+    // 🚫 КОНЕЦ ЗАЩИЩЁННОЙ ЗОНЫ 🚫
 }
 
 export async function renderArtists() {
