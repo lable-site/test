@@ -1,5 +1,5 @@
 // ============================================================
-//  canvas.js — анимация частиц (hero, services) + звёзды
+//  canvas.js — частицы (hero, services) + звёзды (artists, stats, socials)
 // ============================================================
 
 const mouse = { x: 0, y: 0, radius: 150 };
@@ -10,22 +10,21 @@ window.addEventListener('mousemove', (e) => {
 });
 
 // ============================================================
-//  PARTICLES SYSTEM (Hero & Services)
+//  PARTICLES SYSTEM (Hero & Services) — не тронуто
 // ============================================================
 
 class ParticleSystem {
     constructor(canvasId, type) {
         this.canvas = document.getElementById(canvasId);
         if (!this.canvas) return;
-        
+
         this.section = this.canvas.parentElement;
-        // Для Услуг делаем прозрачный фон, чтобы было видно CSS-подложку
         this.ctx = this.canvas.getContext('2d', { alpha: type === 'services' });
         this.type = type;
         this.particles = [];
         this.w = 0;
         this.h = 0;
-        this.bgColor = type === 'hero' ? '#05020a' : null; 
+        this.bgColor = type === 'hero' ? '#05020a' : null;
     }
 
     resize(prefersReducedMotion) {
@@ -52,19 +51,16 @@ class ParticleSystem {
         if (prefersReducedMotion) return;
 
         let amount = Math.max(80, Math.min(Math.floor(this.w * this.h / 10000), 300));
-        // В услугах делаем чуть меньше частиц, чтобы не перегружать текст
-        if (this.type === 'services') amount = Math.floor(amount * 0.7); 
+        if (this.type === 'services') amount = Math.floor(amount * 0.7);
 
         for (let i = 0; i < amount; i++) {
             const x = Math.random() * this.w;
             let y;
             if (this.type === 'hero') {
-                // На главной - частицы формируют волну по центру
                 const wave1 = this.h / 2 + Math.sin(x * 0.005) * 150;
                 const wave2 = this.h / 2 + Math.cos(x * 0.005) * 150;
                 y = (Math.random() > 0.5 ? wave1 : wave2) + (Math.random() * 100 - 50);
             } else {
-                // В услугах - частицы разбросаны хаотично по всей секции
                 y = Math.random() * this.h;
             }
             this.particles.push(new Particle(x, y, this.ctx, this.type));
@@ -86,7 +82,6 @@ class ParticleSystem {
             this.ctx.clearRect(0, 0, this.w, this.h);
         }
 
-        // Вычисляем позицию мыши относительно конкретного канваса (учитываем скролл)
         const rect = this.canvas.getBoundingClientRect();
         const localMouseX = mouse.x - rect.left;
         const localMouseY = mouse.y - rect.top;
@@ -132,10 +127,9 @@ class Particle {
             this.y -= (dy / distance) * force * this.density * timeScale;
         } else {
             const targetX = this.baseX;
-            // В услугах частицы плавают с бОльшей амплитудой
-            const amplitude = this.type === 'hero' ? 15 : 40; 
+            const amplitude = this.type === 'hero' ? 15 : 40;
             const targetY = this.baseY + Math.sin(this.angle) * amplitude;
-            
+
             this.x -= ((this.x - targetX) / 15) * timeScale;
             this.y -= ((this.y - targetY) / 15) * timeScale;
         }
@@ -143,8 +137,97 @@ class Particle {
 }
 
 // ============================================================
-//  STARS SYSTEM (Artists, Stats, Socials)
+//  STARS SYSTEM
+//  ЗАДАЧА 8: Звёзды в Artists — летят слева направо + trail
+//  ЗАДАЧА 10: data-density="light" — мельче, тусклее, реже
 // ============================================================
+
+class Star {
+    constructor(w, h, sectionId, density) {
+        this.sectionId = sectionId;
+        this.density = density || 'normal';
+        // ЗАДАЧА 8: след только для секции артистов
+        this.trailLength = (sectionId === 'artists') ? 5 : 0;
+        this.trail = [];
+        this.w = w;
+        this.h = h;
+        this.reset(true);
+    }
+
+    reset(initial = false) {
+        if (this.sectionId === 'artists') {
+            // ЗАДАЧА 8: Появляются слева, летят вправо и чуть вниз
+            this.x = initial ? Math.random() * this.w : -10;
+            this.y = Math.random() * this.h;
+            this.speedX = Math.random() * 0.3 + 0.12;  // вправо
+            this.speedY = (Math.random() - 0.3) * 0.07; // чуть вниз, иногда вверх
+        } else {
+            // Стандартное падение сверху вниз
+            this.x = Math.random() * this.w;
+            this.y = initial ? Math.random() * this.h : -5;
+            this.speedX = (Math.random() - 0.5) * 0.15;
+            this.speedY = Math.random() * 0.3 + 0.1;
+        }
+
+        // ЗАДАЧА 10: data-density="light" — мельче и тусклее
+        if (this.density === 'light') {
+            this.size = Math.random() * 0.6 + 0.2;
+            this.alpha = Math.random() * 0.18 + 0.06;
+        } else {
+            this.size = Math.random() * 1.5 + 0.5;
+            this.alpha = Math.random() * 0.4 + 0.2;
+        }
+
+        this.twinkleSpeed = Math.random() * 0.01 + 0.003;
+        this.twinkleAngle = Math.random() * Math.PI * 2;
+        this.trail = [];
+    }
+
+    update(timeScale) {
+        // ЗАДАЧА 8: Сохраняем позиции для следа
+        if (this.trailLength > 0) {
+            this.trail.push({ x: this.x, y: this.y });
+            if (this.trail.length > this.trailLength) this.trail.shift();
+        }
+
+        this.x += this.speedX * timeScale;
+        this.y += this.speedY * timeScale;
+        this.twinkleAngle += this.twinkleSpeed * timeScale;
+
+        if (this.sectionId === 'artists') {
+            // Respawn слева когда ушла за правый край
+            if (this.x > this.w + 15) this.reset(false);
+        } else {
+            // Respawn сверху когда ушла за низ или за бока
+            if (this.y > this.h + 5 || this.x < -5 || this.x > this.w + 5) {
+                this.reset(false);
+            }
+        }
+    }
+
+    draw(ctx) {
+        // ЗАДАЧА 8: Рисуем след (только для artists)
+        for (let i = 0; i < this.trail.length; i++) {
+            const ratio = (i + 1) / this.trail.length;
+            // Размер и прозрачность нарастают к голове звезды
+            const trailA = this.alpha * ratio * 0.35;
+            const trailSize = Math.max(0.1, this.size * ratio * 0.55);
+            ctx.beginPath();
+            ctx.arc(this.trail[i].x, this.trail[i].y, trailSize, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(210, 200, 255, ${trailA})`;
+            ctx.fill();
+        }
+
+        // Основная звезда с мерцанием
+        const flickerAmp = this.density === 'light' ? 0.05 : 0.14;
+        const a = Math.max(0, Math.min(1, this.alpha + Math.sin(this.twinkleAngle) * flickerAmp));
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220, 215, 255, ${a})`;
+        ctx.fill();
+    }
+}
 
 class StarSystem {
     constructor(canvas) {
@@ -153,6 +236,9 @@ class StarSystem {
         this.stars = [];
         this.w = 0;
         this.h = 0;
+        // Читаем секцию и плотность из атрибутов
+        this.sectionId = canvas.parentElement?.id || '';
+        this.density = canvas.dataset?.density || 'normal';
     }
 
     resize(prefersReducedMotion) {
@@ -171,11 +257,12 @@ class StarSystem {
         this.stars = [];
         if (prefersReducedMotion) return;
 
-        // Плотность звёзд
-        const amount = Math.min(50, Math.floor(this.w * this.h / 20000));
+        // ЗАДАЧА 10: Базовое количество звёзд, урезается при density=light
+        let amount = Math.min(50, Math.floor(this.w * this.h / 20000));
+        if (this.density === 'light') amount = Math.max(6, Math.floor(amount * 0.35));
 
         for (let i = 0; i < amount; i++) {
-            this.stars.push(new Star(this.w, this.h));
+            this.stars.push(new Star(this.w, this.h, this.sectionId, this.density));
         }
     }
 
@@ -192,47 +279,8 @@ class StarSystem {
     }
 }
 
-class Star {
-    constructor(w, h) {
-        this.reset(w, h, true);
-    }
-
-    reset(w, h, initial = false) {
-        this.x = Math.random() * w;
-        this.y = initial ? Math.random() * h : -5;
-        this.size = Math.random() * 1.5 + 0.5; // Чуть крупнее
-        this.speedY = Math.random() * 0.3 + 0.1; // Быстрее падают
-        this.speedX = (Math.random() - 0.5) * 0.15; // Сильнее дрейфуют вбок
-        this.alpha = Math.random() * 0.4 + 0.2;
-        this.twinkleSpeed = Math.random() * 0.01 + 0.005; // Плавнее мерцают
-        this.twinkleAngle = Math.random() * Math.PI * 2;
-        this.w = w;
-        this.h = h;
-    }
-
-    update(timeScale) {
-        this.y += this.speedY * timeScale;
-        this.x += this.speedX * timeScale;
-        this.twinkleAngle += this.twinkleSpeed * timeScale;
-
-        if (this.y > this.h + 5 || this.x < -5 || this.x > this.w + 5) {
-            this.reset(this.w, this.h, false);
-        }
-    }
-
-    draw(ctx) {
-        const flicker = this.alpha + Math.sin(this.twinkleAngle) * 0.15;
-        const a = Math.max(0, Math.min(1, flicker));
-
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(220, 215, 255, ${a})`;
-        ctx.fill();
-    }
-}
-
 // ============================================================
-//  EXPORTS FOR main.js
+//  EXPORTS — совместимы с main.js, ничего не удалено
 // ============================================================
 
 let heroSystem = null;
@@ -253,7 +301,6 @@ export function animateParticles(dt) {
 }
 
 export function initStars(prefersReducedMotion) {
-    // Собираем все канвасы со звёздами по классу
     if (starSystems.length === 0) {
         const canvases = document.querySelectorAll('.stars-canvas-bg');
         canvases.forEach(canvas => {
