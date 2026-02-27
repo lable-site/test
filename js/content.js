@@ -1,22 +1,27 @@
 // ============================================================
-//  content.js — загрузка услуг, статистики и настроек из Supabase
+//  content.js — загрузка данных из Supabase
 // ============================================================
 
 import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
 
-// ---- 1. Загрузка спектра услуг ----
+// ---- Вспомогательная функция: fetch с проверкой ошибки ----
+async function supabaseFetch(path) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        headers: { 'apikey': SUPABASE_KEY }
+    });
+    if (!res.ok) throw new Error(`Supabase ошибка ${res.status} на /${path}`);
+    return res.json();
+}
+
+// ============================================================
+//  1. Услуги
+// ============================================================
 export async function renderServices() {
     const wrapper = document.querySelector('.services-grid');
     if (!wrapper) return;
 
     try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/services?select=*&order=id`, {
-            headers: { 'apikey': SUPABASE_KEY }
-        });
-
-        if (!res.ok) throw new Error(`Supabase вернул ошибку: ${res.status}`);
-
-        const services = await res.json();
+        const services = await supabaseFetch('services?select=*&order=id');
 
         if (!services || services.length === 0) {
             const section = document.getElementById('services');
@@ -42,11 +47,11 @@ export async function renderServices() {
             if (service.description) {
                 service.description
                     .split('\n')
-                    .map(text => text.trim())
-                    .filter(text => text !== '')
-                    .forEach(text => {
+                    .map(t => t.trim())
+                    .filter(t => t !== '')
+                    .forEach(t => {
                         const li = document.createElement('li');
-                        li.textContent = text;
+                        li.textContent = t;
                         ul.appendChild(li);
                     });
             }
@@ -62,20 +67,15 @@ export async function renderServices() {
     }
 }
 
-// ---- 2. Загрузка статистики ----
+// ============================================================
+//  2. Статистика
+// ============================================================
 export async function renderStats() {
-    // ИСПРАВЛЕНИЕ: Ищем по классу, так как в HTML это <div class="stats-grid">
     const grid = document.querySelector('.stats-grid');
     if (!grid) return;
 
     try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/stats?select=*&order=order_id`, {
-            headers: { 'apikey': SUPABASE_KEY }
-        });
-
-        if (!res.ok) throw new Error(`Supabase вернул ошибку: ${res.status}`);
-
-        const stats = await res.json();
+        const stats = await supabaseFetch('stats?select=*&order=order_id');
 
         if (!stats || stats.length === 0) return;
 
@@ -89,7 +89,7 @@ export async function renderStats() {
             number.className = 'stat-number';
             number.dataset.target = stat.value || 0;
             number.dataset.suffix = stat.suffix || '';
-            number.textContent = '0'; 
+            number.textContent = '0';
 
             const label = document.createElement('div');
             label.className = 'stat-label';
@@ -105,58 +105,122 @@ export async function renderStats() {
     }
 }
 
-// ---- 3. Загрузка ссылок и кнопок ----
+// ============================================================
+//  3. Соцсети — ЗАДАЧА 7
+//  Берёт данные из таблицы social_links (name, url, icon_class, order_id)
+//  Рендерит безопасно через createElement
+//  Fallback: если таблица недоступна — показывает дефолтные кнопки
+// ============================================================
+const fallbackSocials = [
+    { name: 'ВКонтакте', url: 'https://vk.ru/nativelabel',                  icon_class: 'fa-brands fa-vk' },
+    { name: 'Telegram',  url: 'https://t.me/native_label',                  icon_class: 'fa-brands fa-telegram' },
+    { name: 'YouTube',   url: 'https://youtube.com/@nativelabel',            icon_class: 'fa-brands fa-youtube' },
+];
+
+export async function renderSocials() {
+    const container = document.getElementById('social-links-container');
+    if (!container) return;
+
+    let socials = fallbackSocials;
+
+    try {
+        const data = await supabaseFetch('social_links?select=*&order=order_id');
+        if (data && data.length > 0) socials = data;
+    } catch (error) {
+        // Таблица ещё не создана или ошибка — используем fallback, сайт не ломается
+        console.warn('social_links недоступен, используем fallback:', error.message);
+    }
+
+    container.innerHTML = '';
+
+    socials.forEach(social => {
+        const a = document.createElement('a');
+        // aria-label используется content.js для обновления ссылок через site_config
+        a.setAttribute('aria-label', social.name || '');
+        a.href = social.url || '#';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'social-btn';
+
+        const icon = document.createElement('i');
+        // Безопасная очистка class-строки иконки
+        const safeClass = (social.icon_class || 'fa-solid fa-link').replace(/[^a-zA-Z0-9\-\s]/g, '');
+        icon.className = safeClass;
+        icon.setAttribute('aria-hidden', 'true');
+
+        const text = document.createTextNode(' ' + (social.name || ''));
+
+        a.appendChild(icon);
+        a.appendChild(text);
+        container.appendChild(a);
+    });
+}
+
+// ============================================================
+//  4. Настройки сайта — site_config
+//  Включает: hero_text, join_text, demo_link, demo_text,
+//            vk_link, tg_link, yt_link,
+//            ЗАДАЧА 4: artists_title, services_title
+//            ЗАДАЧА 6: footer_copyright, footer_tagline
+// ============================================================
 export async function renderSiteConfig() {
     try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=*`, {
-            headers: { 'apikey': SUPABASE_KEY }
-        });
+        const config = await supabaseFetch('site_config?select=*');
 
-        if (!res.ok) throw new Error(`Supabase вернул ошибку: ${res.status}`);
+        const s = {};
+        config.forEach(item => { if (item.key) s[item.key] = item.value; });
 
-        const config = await res.json();
-
-        const settings = {};
-        config.forEach(item => {
-            if (item.key) settings[item.key] = item.value;
-        });
-
+        // --- Hero текст ---
         const heroIntro = document.querySelector('.hero-intro');
-        if (heroIntro && settings.hero_text) {
+        if (heroIntro && s.hero_text) {
             heroIntro.innerHTML = '';
-            settings.hero_text.split('\n').forEach((line, index, arr) => {
+            s.hero_text.split('\n').forEach((line, i, arr) => {
                 heroIntro.appendChild(document.createTextNode(line));
-                if (index < arr.length - 1) {
-                    heroIntro.appendChild(document.createElement('br'));
-                }
+                if (i < arr.length - 1) heroIntro.appendChild(document.createElement('br'));
             });
         }
 
-        const joinTitle = document.querySelector('.socials-section .section-title');
-        if (joinTitle && settings.join_text) {
-            joinTitle.textContent = settings.join_text;
-        }
+        // --- Заголовок соцсетей ---
+        const joinTitle = document.querySelector('.socials-title');
+        if (joinTitle && s.join_text) joinTitle.textContent = s.join_text;
 
+        // --- Кнопка "Отправить демо" ---
         const demoBtn = document.querySelector('.btn-primary');
         if (demoBtn) {
-            if (settings.demo_link) demoBtn.href = settings.demo_link;
-            if (settings.demo_text) demoBtn.textContent = settings.demo_text;
+            if (s.demo_link) demoBtn.href = s.demo_link;
+            if (s.demo_text) demoBtn.textContent = s.demo_text;
         }
 
-        if (settings.vk_link) {
+        // --- Ссылки соцсетей (обновляем уже отрендеренные кнопки из renderSocials) ---
+        if (s.vk_link) {
             const vk = document.querySelector('.social-btn[aria-label="ВКонтакте"]');
-            if (vk) vk.href = settings.vk_link;
+            if (vk) vk.href = s.vk_link;
         }
-        if (settings.tg_link) {
+        if (s.tg_link) {
             const tg = document.querySelector('.social-btn[aria-label="Telegram"]');
-            if (tg) tg.href = settings.tg_link;
+            if (tg) tg.href = s.tg_link;
         }
-        if (settings.yt_link) {
+        if (s.yt_link) {
             const yt = document.querySelector('.social-btn[aria-label="YouTube"]');
-            if (yt) yt.href = settings.yt_link;
+            if (yt) yt.href = s.yt_link;
         }
+
+        // --- ЗАДАЧА 4: Заголовки секций ---
+        const titleArtists = document.getElementById('title-artists');
+        if (titleArtists && s.artists_title) titleArtists.textContent = s.artists_title;
+
+        const titleServices = document.getElementById('title-services');
+        if (titleServices && s.services_title) titleServices.textContent = s.services_title;
+
+        // --- ЗАДАЧА 6: Футер ---
+        const footerCopyright = document.getElementById('footer-copyright');
+        if (footerCopyright && s.footer_copyright) footerCopyright.textContent = s.footer_copyright;
+
+        const footerTagline = document.getElementById('footer-tagline');
+        if (footerTagline && s.footer_tagline) footerTagline.textContent = s.footer_tagline;
 
     } catch (error) {
-        console.error('Ошибка загрузки настроек сайта:', error);
+        console.error('Ошибка загрузки настроек:', error);
+        // Сайт продолжит работу с дефолтными значениями из HTML
     }
 }
