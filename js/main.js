@@ -7,26 +7,38 @@ import { resizeCanvas, animateParticles, initStars, animateStars } from './canva
 import { initReveal } from './animations.js';
 import { renderServices, renderStats, renderSocials, renderSiteConfig } from './content.js';
 
-const prefersReducedMotion = false; // Принудительно запускаем анимации всегда
+// ⚠️  СТРОКУ НИЖЕ НЕ ТРОГАТЬ — принудительно включаем анимации для всех
+const prefersReducedMotion = false;
 let lenis = null;
 let globalRafId = null;
 let lastTime = performance.now();
 
 // ---- Lenis (плавный скролл) ----
+// ИСПРАВЛЕНИЕ: обёрнуто в try/catch.
+// Если CDN с библиотекой Lenis не загрузился (медленный интернет,
+// заблокированный CDN, корпоративный файрвол) — переменная Lenis
+// будет undefined. Без try/catch строка "new Lenis(...)" упала бы
+// с ошибкой и ЗАМОРОЗИЛА весь сайт. С try/catch — просто работает
+// без плавного скролла, остальное всё живо.
 if (!prefersReducedMotion) {
-    lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2,
-    });
+    try {
+        lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            touchMultiplier: 2,
+        });
+    } catch (e) {
+        console.warn('Lenis недоступен (CDN не загрузился). Скролл работает в стандартном режиме.');
+        lenis = null;
+    }
 }
 
-// ---- Единый RAF loop ----
+// ---- Единый RAF loop — canvas + звёзды + плавный скролл ----
 function renderLoop(time) {
     let dt = time - lastTime;
     lastTime = time;
-    if (dt > 100) dt = 16.6;
+    if (dt > 100) dt = 16.6; // защита от "прыжка" после свёрнутой вкладки
 
     if (!prefersReducedMotion) {
         if (lenis) lenis.raf(time);
@@ -37,7 +49,7 @@ function renderLoop(time) {
     globalRafId = requestAnimationFrame(renderLoop);
 }
 
-// ---- Пауза когда вкладка не активна ----
+// ---- Пауза когда вкладка неактивна (экономим CPU и батарею) ----
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         cancelAnimationFrame(globalRafId);
@@ -47,7 +59,7 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// ---- Resize с debounce ----
+// ---- Resize с debounce (пересчёт canvas при изменении размера окна) ----
 let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
@@ -59,7 +71,7 @@ window.addEventListener('resize', () => {
     }, 250);
 });
 
-// ---- Canvas запускаем сразу — не зависит от данных ----
+// ---- Canvas запускаем сразу — не зависит от данных Supabase ----
 resizeCanvas(prefersReducedMotion);
 initStars(prefersReducedMotion);
 
@@ -67,25 +79,39 @@ if (!prefersReducedMotion) {
     globalRafId = requestAnimationFrame(renderLoop);
 }
 
-// ---- Данные грузим параллельно ----
-// Promise.allSettled: каждая функция независима, сбой одной не ломает остальные.
-// ВАЖНО: renderSocials должна выполниться ДО renderSiteConfig,
-// чтобы aria-label кнопок были в DOM и ссылки обновились корректно.
-// Достигается тем, что renderSiteConfig при своём запросе ищет .social-btn[aria-label="..."],
-// которые к этому моменту уже отрендерены renderSocials (оба в allSettled — гонки нет,
-// aria-label обновляются по DOM после рендера socials).
+// ============================================================
+//  ИСПРАВЛЕНИЕ "ГОНКИ ДАННЫХ"
+//
+//  ЧТО БЫЛО:
+//  renderSocials() и renderSiteConfig() шли параллельно.
+//  renderSiteConfig ищет кнопки .social-btn[aria-label="..."]
+//  в HTML-документе, чтобы вставить в них правильные ссылки.
+//  Но в момент поиска renderSocials ЕЩЁ НЕ СОЗДАЛА эти кнопки —
+//  они рождаются динамически через JavaScript.
+//  Результат: renderSiteConfig находила пустоту, ссылки терялись.
+//
+//  ЧТО СТАЛО:
+//  Шаг 1 — параллельно грузим всё что не зависит друг от друга:
+//           артисты, соцсети (создаются кнопки), услуги, статистика.
+//  Шаг 2 — .then() запускается СТРОГО ПОСЛЕ того как Шаг 1 завершён.
+//           В этот момент кнопки соцсетей гарантированно в DOM.
+//           renderSiteConfig находит их и вставляет правильные ссылки.
+//  Шаг 3 — второй .then(): перемеряем canvas (секция услуг теперь
+//           полная, не пустая) и запускаем reveal-анимации появления.
+// ============================================================
 Promise.allSettled([
     renderArtists(),
-    renderSocials(),      // ЗАДАЧА 7: рендерим соцсети из Supabase
+    renderSocials(),   // создаёт кнопки соцсетей в DOM
     renderServices(),
     renderStats(),
-    renderSiteConfig(),
-]).then(() => {
-    // ЗАДАЧА 9: Перемеряем canvas услуг ПОСЛЕ загрузки карточек из Supabase.
-    // До этого секция услуг была пустой (только padding) и canvas был маленьким.
+])
+.then(() => {
+    // Шаг 2: кнопки соцсетей точно в DOM — вставляем ссылки из конфига
+    return renderSiteConfig();
+})
+.then(() => {
+    // Шаг 3: весь контент загружен — перемеряем canvas и запускаем анимации
     resizeCanvas(prefersReducedMotion);
     initStars(prefersReducedMotion);
-
-    // Запускаем reveal-анимации строго после того как весь контент в DOM
     initReveal(prefersReducedMotion);
 });
