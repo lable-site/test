@@ -14,7 +14,11 @@
 
     <title>NATIVE | Музыкальный лейбл</title>
 
-    <link rel="icon" type="image/png" href="./logo.png">
+    <!-- ЗАДАЧА 5: Правильные favicon теги для чёткого отображения во вкладке -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./logo.png">
+    <link rel="shortcut icon" href="./logo.png">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,9 +44,11 @@
             <a href="#services">Услуги</a>
             <a href="#artists">Артисты</a>
         </nav>
+        <!-- Текст и ссылка подтягиваются из Supabase через content.js -->
         <a href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Отправить демо"></a>
     </header>
 
+    <!-- 1. HERO -->
     <section class="hero" id="about">
         <canvas id="hero-canvas"></canvas>
         <div class="hero-overlay"></div>
@@ -52,12 +58,15 @@
         </div>
     </section>
 
+    <!-- 2. АРТИСТЫ -->
     <section class="section artists-section" id="artists">
         <canvas class="stars-canvas-bg"></canvas>
 
         <div class="section-header reveal">
             <h2 class="section-title">
-                <i class="fa-solid fa-microphone header-icon" aria-hidden="true"></i> АРТИСТЫ
+                <!-- ЗАДАЧА 4: Иконка снаружи span, текст внутри — span обновляется из Supabase -->
+                <i class="fa-solid fa-microphone header-icon" aria-hidden="true"></i>
+                <span id="title-artists">АРТИСТЫ</span>
             </h2>
         </div>
 
@@ -66,19 +75,24 @@
         </div>
     </section>
 
+    <!-- 3. УСЛУГИ -->
     <section class="section" id="services">
         <canvas id="services-canvas"></canvas>
 
         <div class="section-header reveal">
             <h2 class="section-title">
-                <i class="fa-solid fa-briefcase header-icon" aria-hidden="true"></i> СПЕКТР УСЛУГ
+                <!-- ЗАДАЧА 4: Иконка снаружи span, текст внутри — span обновляется из Supabase -->
+                <i class="fa-solid fa-briefcase header-icon" aria-hidden="true"></i>
+                <span id="title-services">СПЕКТР УСЛУГ</span>
             </h2>
         </div>
         <div class="services-grid"></div>
     </section>
 
+    <!-- 4. СТАТИСТИКА -->
+    <!-- ЗАДАЧА 10: data-density="light" — в StarSystem читается и делает звёзды меньше/тусклее/реже -->
     <section class="section stats-section" id="stats">
-        <canvas class="stars-canvas-bg"></canvas>
+        <canvas class="stars-canvas-bg" data-density="light"></canvas>
 
         <div class="stats-grid" id="stats-grid">
             <div class="stat-card reveal">
@@ -96,26 +110,21 @@
         </div>
     </section>
 
+    <!-- 5. СОЦСЕТИ -->
+    <!-- ЗАДАЧА 7: Хардкод-кнопки удалены. Рендерятся из Supabase через renderSocials() -->
     <section class="section socials-section reveal">
         <canvas class="stars-canvas-bg"></canvas>
 
-        <h2 class="section-title"></h2>
-        <div class="social-links">
-            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ВКонтакте">
-                <i class="fa-brands fa-vk" aria-hidden="true"></i> ВКонтакте
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Telegram">
-                <i class="fa-brands fa-telegram" aria-hidden="true"></i> Telegram
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="YouTube">
-                <i class="fa-brands fa-youtube" aria-hidden="true"></i> YouTube
-            </a>
-        </div>
+        <!-- Текст подтягивается из Supabase через content.js (ключ join_text) -->
+        <h2 class="section-title socials-title"></h2>
+        <!-- social-links заполняется JS -->
+        <div class="social-links" id="social-links-container"></div>
     </section>
 
+    <!-- ЗАДАЧА 6: ID на div-ах футера — обновляются из Supabase через ключи footer_copyright / footer_tagline -->
     <footer>
-        <div>© 2026 NATIVE LABEL. ALL RIGHTS RESERVED.</div>
-        <div>ДЕМОНСТРАЦИЯ ОФИЦИАЛЬНОГО САЙТА ЛЕЙБЛА</div>
+        <div id="footer-copyright">© 2026 NATIVE LABEL. ALL RIGHTS RESERVED.</div>
+        <div id="footer-tagline">ДЕМОНСТРАЦИЯ ОФИЦИАЛЬНОГО САЙТА ЛЕЙБЛА</div>
     </footer>
 
 </div>
